@@ -15,6 +15,13 @@
       "require": "./dist/cjs/index.js",
       "node": "./dist/cjs/index.js",
       "default": "./dist/cjs/index.js"
+    },
+    "./utils": {
+      "types": "./dist/types/src/utils.d.ts",
+      "import": "./dist/esm/utils.js",
+      "require": "./dist/cjs/utils.js",
+      "node": "./dist/cjs/utils.js",
+      "default": "./dist/cjs/utils.js"
     }
   },
   "files": [
