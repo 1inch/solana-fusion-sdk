@@ -5,7 +5,7 @@ function main(): void {
     const root = path.join(__dirname, '..')
     const contractDir = path.join(__dirname, '../contracts/fusion-contract')
 
-    execSync('yarn cache clean && yarn && yarn build', {
+    execSync('yarn && yarn build', {
         cwd: contractDir,
         stdio: 'inherit'
     })
