@@ -3,6 +3,10 @@ name: PR validation
 on:
   pull_request:
 
+env:
+  ANCHOR_VER: 0.30.1
+  SOLANA_CLI_VER: 2.1.13
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -27,6 +31,14 @@ jobs:
       - name: Install Yarn # required for integration tests
         run: npm install -g yarn
 
+      - name: Cache Solana CLI tools  # cache solana cli-tools
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/solana/
+            ~/.local/share/solana/
+          key: solana-cli-${{ runner.os }}-build-${{ vars.SOLANA_CLI_VER }}
+
       - name: Install Solana CLI (beta) # required for integration tests
         run: |
           sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
@@ -42,7 +54,7 @@ jobs:
           workspaces: "./contracts/fusion-contract"
 
       - name: Install Anchor
-        run: npm i -g @coral-xyz/anchor-cli@0.30.1
+        run: npm i -g @coral-xyz/anchor-cli@${{ vars.ANCHOR_VER }}
         shell: bash
 
 #      - name: Install Anchor # required for integration tests
