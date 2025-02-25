@@ -26,6 +26,15 @@ jobs:
       - name: Install Yarn # required for integration tests
         run: npm install -g yarn
 
+      - name: Setup Git Credentials
+        run: |
+          git config --global --add url."https://${GITHUB_TOKEN}@github.com/1inch/".insteadOf "git@github.com/1inch/"
+          git config --global --add url."https://${GITHUB_TOKEN}@github.com/1inch/".insteadOf "ssh://git@github.com/1inch/"
+          git config --global --add url."https://${GITHUB_TOKEN}@github.com/1inch/".insteadOf "git+ssh://git@github.com/1inch/"
+          git config --global --add url."https://${GITHUB_TOKEN}@github.com/1inch/".insteadOf "https://github.com/1inch/"
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_GITHUB_TOKEN }}
+
       - name: Auth in GitHub private registry npm
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
