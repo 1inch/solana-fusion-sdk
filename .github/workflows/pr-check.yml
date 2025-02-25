@@ -27,6 +27,11 @@ jobs:
       - name: Install Yarn # required for integration tests
         run: npm install -g yarn
 
+      - name: Install Solana CLI (beta) # required for integration tests
+        run: |
+          sh -c "$(curl -sSfL https://release.solana.com/beta/install)"
+          echo "/home/runner/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
       - name: Auth in GitHub private registry npm
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
