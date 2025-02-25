@@ -12,19 +12,15 @@ import {
     sol,
     SYSTEM_PROGRAM_ID,
     withBalanceChanges
-} from '../utils'
-import {IDL as WhitelistIDL} from '../../src/idl/whitelist'
-import {getPda} from '../../src/utils/addresses/pda'
-import {TestConnection} from '../test-connection'
-import {
-    Address,
-    AuctionDetails,
-    FusionOrder,
-    FusionSwapContract
-} from '../../src'
-import {id} from '../../src/utils/id'
-import {now} from '../../src/utils/time/now'
-import {getAta} from '../../src/utils/addresses/ata'
+} from './utils'
+import {TestConnection} from './test-connection'
+import {IDL as WhitelistIDL} from '../src/idl/whitelist'
+import {getPda} from '../src/utils/addresses/pda'
+import {Address, AuctionDetails, FusionOrder, FusionSwapContract} from '../src'
+import {id} from '../src/utils/id'
+import {now} from '../src/utils/time/now'
+import {getAta} from '../src/utils/addresses/ata'
+import {Whitelist} from '../src/contracts/whitelist'
 
 describe('FusionSwap', () => {
     const srcToken = Keypair.generate()
@@ -32,11 +28,9 @@ describe('FusionSwap', () => {
     const maker = Keypair.generate()
     const taker = Keypair.generate()
     const owner = Keypair.generate()
-    const whitelistProgramId = new PublicKey(
-        'BiZpdYaUvYa6DLn5Hc769UtmEuoCEbEmt314TFQXtc6k'
-    )
+    const whitelistProgramId = new PublicKey(Whitelist.ADDRESS.toBuffer())
     const fusionSwapProgramId = new PublicKey(
-        '9hbsrgqQUYBPdAiriyn5A7cr3zBzN3EmeXN6mJLyizHh'
+        FusionSwapContract.ADDRESS.toBuffer()
     )
 
     let programTestCtx: ProgramTestContext
@@ -85,11 +79,20 @@ describe('FusionSwap', () => {
                         amount: sol(100)
                     }
                 ]
+            },
+            {
+                mint: srcToken,
+                owners: [
+                    {
+                        address: taker.publicKey,
+                        amount: sol(0)
+                    }
+                ]
             }
         ])
     })
 
-    it('should create order', async () => {
+    it('should fill order with no fee', async () => {
         const order = new FusionOrder(
             {
                 srcMint: Address.fromPublicKey(srcToken.publicKey),
@@ -105,12 +108,13 @@ describe('FusionSwap', () => {
 
         const contract = FusionSwapContract.default()
 
+        // region create escrow
         const ix = contract.create(order, {
             maker: Address.fromPublicKey(maker.publicKey),
             srcTokenProgram: Address.fromPublicKey(TOKEN_PROGRAM_ID)
         })
 
-        const tx = new Transaction().add({
+        const initTx = new Transaction().add({
             ...ix,
             programId: new PublicKey(ix.programId.toBuffer()),
             keys: ix.accounts.map((a) => ({
@@ -119,12 +123,12 @@ describe('FusionSwap', () => {
             }))
         })
 
-        tx.recentBlockhash = programTestCtx.lastBlockhash
-        tx.sign(maker)
+        initTx.recentBlockhash = programTestCtx.lastBlockhash
+        initTx.sign(maker)
 
         const [makerDiff, escrowDiff] = await withBalanceChanges(
             programTestCtx,
-            () => programTestCtx.banksClient.processTransaction(tx),
+            () => programTestCtx.banksClient.processTransaction(initTx),
             [
                 getAta(
                     maker.publicKey,
@@ -137,6 +141,64 @@ describe('FusionSwap', () => {
 
         expect(makerDiff).toEqual(-order.srcAmount)
         expect(escrowDiff).toEqual(order.srcAmount)
+
+        // endregion create escrow
+
+        // region fill
+        const ix2 = contract.fill(order, order.srcAmount, {
+            maker: Address.fromPublicKey(maker.publicKey),
+            taker: Address.fromPublicKey(taker.publicKey),
+            srcTokenProgram: Address.fromPublicKey(TOKEN_PROGRAM_ID),
+            dstTokenProgram: Address.fromPublicKey(TOKEN_PROGRAM_ID)
+        })
+
+        const fillTx = new Transaction().add({
+            ...ix2,
+            programId: new PublicKey(ix2.programId.toBuffer()),
+            keys: ix2.accounts.map((a) => ({
+                ...a,
+                pubkey: new PublicKey(a.pubkey.toBuffer())
+            }))
+        })
+
+        fillTx.recentBlockhash = programTestCtx.lastBlockhash
+        fillTx.sign(taker)
+
+        // ┌────────────┐       ┌───────────┐
+        // │srcEscrowAta│──SRC─▶│srcTakerAta│
+        // └────────────┘       └───────────┘
+        // ┌───────────┐       ┌───────────┐
+        // │dstMakerAta│◀─DST──│dstTakerAta│
+        // └───────────┘       └───────────┘
+        const [srcEscrowAta, dstMakerAta, srcTakerAta, dstTakerAta] =
+            await withBalanceChanges(
+                programTestCtx,
+                () => programTestCtx.banksClient.processTransaction(fillTx),
+                [
+                    order.getEscrow(maker.publicKey),
+                    getAta(
+                        maker.publicKey,
+                        order.dstMint,
+                        Address.TOKEN_PROGRAM_ID
+                    ),
+                    getAta(
+                        taker.publicKey,
+                        order.srcMint,
+                        Address.TOKEN_PROGRAM_ID
+                    ),
+                    getAta(
+                        taker.publicKey,
+                        order.dstMint,
+                        Address.TOKEN_PROGRAM_ID
+                    )
+                ]
+            )
+
+        expect(srcEscrowAta).toEqual(-srcTakerAta)
+        expect(dstMakerAta).toEqual(-dstTakerAta)
+        expect(dstMakerAta).toEqual(order.dstAmount)
+        expect(srcTakerAta).toEqual(order.srcAmount)
+        // endregion fill
     })
 })
 

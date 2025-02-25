@@ -126,6 +126,10 @@ export class FusionOrder {
         return this.orderConfig.id
     }
 
+    get unwrapToNative(): boolean {
+        return this.orderConfig.nativeDstAsset
+    }
+
     public build(): OrderConfig {
         const {fees} = this.orderConfig
 

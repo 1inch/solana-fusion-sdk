@@ -1,5 +1,4 @@
 import {WritableDeep} from 'type-fest'
-
 const _IDL = {
     address: '9hbsrgqQUYBPdAiriyn5A7cr3zBzN3EmeXN6mJLyizHh',
     metadata: {
@@ -30,10 +29,7 @@ const _IDL = {
                                 kind: 'const',
                                 value: [101, 115, 99, 114, 111, 119]
                             },
-                            {
-                                kind: 'account',
-                                path: 'maker'
-                            },
+                            {kind: 'account', path: 'maker'},
                             {kind: 'arg', path: 'orderHash'}
                         ]
                     }
@@ -45,10 +41,7 @@ const _IDL = {
                     pda: {
                         seeds: [
                             {kind: 'account', path: 'escrow'},
-                            {
-                                kind: 'account',
-                                path: 'srcTokenProgram'
-                            },
+                            {kind: 'account', path: 'srcTokenProgram'},
                             {kind: 'account', path: 'srcMint'}
                         ],
                         program: {
@@ -69,10 +62,7 @@ const _IDL = {
                     pda: {
                         seeds: [
                             {kind: 'account', path: 'maker'},
-                            {
-                                kind: 'account',
-                                path: 'srcTokenProgram'
-                            },
+                            {kind: 'account', path: 'srcTokenProgram'},
                             {kind: 'account', path: 'srcMint'}
                         ],
                         program: {
@@ -103,10 +93,7 @@ const _IDL = {
                     signer: true
                 },
                 {name: 'srcMint', docs: ['Source asset']},
-                {
-                    name: 'dstMint',
-                    docs: ['Destination asset']
-                },
+                {name: 'dstMint', docs: ['Destination asset']},
                 {
                     name: 'makerSrcAta',
                     docs: ["Maker's ATA of src_mint"],
@@ -114,10 +101,7 @@ const _IDL = {
                     pda: {
                         seeds: [
                             {kind: 'account', path: 'maker'},
-                            {
-                                kind: 'account',
-                                path: 'srcTokenProgram'
-                            },
+                            {kind: 'account', path: 'srcTokenProgram'},
                             {kind: 'account', path: 'srcMint'}
                         ],
                         program: {
@@ -132,10 +116,7 @@ const _IDL = {
                     }
                 },
                 {name: 'makerReceiver'},
-                {
-                    name: 'escrow',
-                    docs: ['Account to store order conditions']
-                },
+                {name: 'escrow', docs: ['Account to store order conditions']},
                 {
                     name: 'escrowSrcAta',
                     docs: ['ATA of src_mint to store escrowed tokens'],
@@ -143,10 +124,7 @@ const _IDL = {
                     pda: {
                         seeds: [
                             {kind: 'account', path: 'escrow'},
-                            {
-                                kind: 'account',
-                                path: 'srcTokenProgram'
-                            },
+                            {kind: 'account', path: 'srcTokenProgram'},
                             {kind: 'account', path: 'srcMint'}
                         ],
                         program: {
@@ -161,10 +139,7 @@ const _IDL = {
                     }
                 },
                 {name: 'protocolDstAta', optional: true},
-                {
-                    name: 'integratorDstAta',
-                    optional: true
-                },
+                {name: 'integratorDstAta', optional: true},
                 {
                     name: 'associatedTokenProgram',
                     address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
@@ -206,25 +181,19 @@ const _IDL = {
                         program: {
                             kind: 'const',
                             value: [
-                                159, 58, 203, 34, 108, 236, 191, 83, 14, 254, 1,
-                                166, 55, 85, 10, 138, 41, 200, 187, 159, 204,
-                                72, 52, 108, 221, 198, 219, 155, 200, 15, 39,
-                                241
+                                38, 236, 245, 92, 234, 101, 113, 197, 44, 9, 86,
+                                204, 101, 135, 29, 146, 55, 150, 163, 138, 120,
+                                130, 108, 248, 12, 230, 28, 220, 211, 97, 69,
+                                171
                             ]
                         }
                     }
                 },
                 {name: 'maker', writable: true},
                 {name: 'makerReceiver'},
-                {
-                    name: 'srcMint',
-                    docs: ['Maker asset']
-                },
+                {name: 'srcMint', docs: ['Maker asset']},
                 {name: 'dstMint', docs: ['Taker asset']},
-                {
-                    name: 'escrow',
-                    docs: ['Account to store order conditions']
-                },
+                {name: 'escrow', docs: ['Account to store order conditions']},
                 {
                     name: 'escrowSrcAta',
                     docs: ['ATA of src_mint to store escrowed tokens'],
@@ -232,10 +201,7 @@ const _IDL = {
                     pda: {
                         seeds: [
                             {kind: 'account', path: 'escrow'},
-                            {
-                                kind: 'account',
-                                path: 'srcTokenProgram'
-                            },
+                            {kind: 'account', path: 'srcTokenProgram'},
                             {kind: 'account', path: 'srcMint'}
                         ],
                         program: {
@@ -257,10 +223,7 @@ const _IDL = {
                     pda: {
                         seeds: [
                             {kind: 'account', path: 'makerReceiver'},
-                            {
-                                kind: 'account',
-                                path: 'dstTokenProgram'
-                            },
+                            {kind: 'account', path: 'dstTokenProgram'},
                             {kind: 'account', path: 'dstMint'}
                         ],
                         program: {
@@ -275,11 +238,7 @@ const _IDL = {
                     }
                 },
                 {name: 'protocolDstAta', writable: true, optional: true},
-                {
-                    name: 'integratorDstAta',
-                    writable: true,
-                    optional: true
-                },
+                {name: 'integratorDstAta', writable: true, optional: true},
                 {
                     name: 'takerSrcAta',
                     docs: ["Taker's ATA of src_mint"],
@@ -292,10 +251,7 @@ const _IDL = {
                     pda: {
                         seeds: [
                             {kind: 'account', path: 'taker'},
-                            {
-                                kind: 'account',
-                                path: 'dstTokenProgram'
-                            },
+                            {kind: 'account', path: 'dstTokenProgram'},
                             {kind: 'account', path: 'dstMint'}
                         ],
                         program: {
@@ -325,10 +281,7 @@ const _IDL = {
                     name: 'reducedOrder',
                     type: {defined: {name: 'reducedOrderConfig'}}
                 },
-                {
-                    name: 'amount',
-                    type: 'u64'
-                }
+                {name: 'amount', type: 'u64'}
             ]
         }
     ],
@@ -345,21 +298,13 @@ const _IDL = {
             msg: 'Inconsistent native dst trait'
         },
         {code: 6001, name: 'invalidAmount', msg: 'Invalid amount'},
-        {
-            code: 6002,
-            name: 'missingMakerDstAta',
-            msg: 'Missing maker dst ata'
-        },
+        {code: 6002, name: 'missingMakerDstAta', msg: 'Missing maker dst ata'},
         {
             code: 6003,
             name: 'notEnoughTokensInEscrow',
             msg: 'Not enough tokens in escrow'
         },
-        {
-            code: 6004,
-            name: 'orderExpired',
-            msg: 'Order expired'
-        },
+        {code: 6004, name: 'orderExpired', msg: 'Order expired'},
         {
             code: 6005,
             name: 'invalidEstimatedTakingAmount',
@@ -388,10 +333,7 @@ const _IDL = {
                 kind: 'struct',
                 fields: [
                     {name: 'startTime', type: 'u32'},
-                    {
-                        name: 'duration',
-                        type: 'u32'
-                    },
+                    {name: 'duration', type: 'u32'},
                     {name: 'initialRateBump', type: 'u16'},
                     {
                         name: 'pointsAndTimeDeltas',
@@ -448,20 +390,11 @@ const _IDL = {
                 fields: [
                     {name: 'id', type: 'u32'},
                     {name: 'srcAmount', type: 'u64'},
-                    {
-                        name: 'minDstAmount',
-                        type: 'u64'
-                    },
+                    {name: 'minDstAmount', type: 'u64'},
                     {name: 'estimatedDstAmount', type: 'u64'},
-                    {
-                        name: 'expirationTime',
-                        type: 'u32'
-                    },
+                    {name: 'expirationTime', type: 'u32'},
                     {name: 'nativeDstAsset', type: 'bool'},
-                    {
-                        name: 'fee',
-                        type: {defined: {name: 'reducedFeeConfig'}}
-                    },
+                    {name: 'fee', type: {defined: {name: 'reducedFeeConfig'}}},
                     {
                         name: 'dutchAuctionData',
                         type: {defined: {name: 'dutchAuctionData'}}

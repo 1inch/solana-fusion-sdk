@@ -8,7 +8,6 @@ on:
 
 jobs:
   # Uncomment for public package and make sure secrets.NPM_AUTH_TOKEN is defined on repo
-  # Also remove all `Auth in GitHub private registry npm` in release and publish workflows
 #  publish-to-npm:
 #    runs-on: ubuntu-latest
 #    steps:
@@ -51,11 +50,11 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           registry-url: 'https://npm.pkg.github.com'
           scope: ${{ github.repository_owner }}
           cache: pnpm
