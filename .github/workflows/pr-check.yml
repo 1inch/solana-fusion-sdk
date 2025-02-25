@@ -37,8 +37,12 @@ jobs:
         with:
           cache-targets: "./contracts/fusion-contract"
 
-      - name: Install Anchor # required for integration tests
-        run: cargo install --git https://github.com/coral-xyz/anchor --tag v0.30.1 anchor-cli
+      - name: Install Anchor
+        run: npm i -g @coral-xyz/anchor-cli@0.30.1
+        shell: bash
+
+#      - name: Install Anchor # required for integration tests
+#        run: cargo install --git https://github.com/coral-xyz/anchor --tag v0.30.1 anchor-cli
 
       - name: Auth in GitHub private registry npm
         run: |
