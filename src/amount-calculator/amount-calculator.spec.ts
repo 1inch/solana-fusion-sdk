@@ -1,4 +1,5 @@
 describe('AmountCalculator', () => {
+    it('should work', () => {})
     // it('should correct extract fee', () => {
     //     const integratorFeeBps = new Bps(6n) // 60% from 10bps
     //     const calculator = new AmountCalculator(

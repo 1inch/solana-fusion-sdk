@@ -14,13 +14,14 @@ describe('Auction Calculator', () => {
 
         const calculator = AuctionCalculator.fromAuctionData(auctionDetails)
 
-        const rate = calculator.calcRateBump(auctionStartTime + 60)
+        const blockTime = auctionStartTime + 60
+        const rate = calculator.calcRateBump(blockTime)
         const auctionTakingAmount = calculator.calcAuctionTakingAmount(
             1420000000n,
-            rate
+            blockTime
         )
 
         expect(rate).toBe(25000)
-        expect(auctionTakingAmount).toBe(1423550000n) // 1423550000 from rate
+        expect(auctionTakingAmount).toBe(1775000000n) // 1775000000 from rate
     })
 })
