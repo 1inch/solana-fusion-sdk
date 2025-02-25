@@ -34,7 +34,7 @@ jobs:
 
       - name: run ls-la
         run: |
-          ls -la
+          ls -la ./contracts/fusion-contract
 
       - name: Cache Cargo dependencies
         uses: Swatinem/rust-cache@v2
