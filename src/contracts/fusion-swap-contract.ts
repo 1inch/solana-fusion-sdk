@@ -1,6 +1,6 @@
 import {BN, BorshCoder} from '@coral-xyz/anchor'
 import {TransactionInstruction} from './transaction-instruction'
-import {Whitelist} from './whitelist'
+import {WhitelistContract} from './whitelist-contract'
 import {getAta} from '../utils/addresses/ata'
 import {FusionOrder} from '../fusion-order'
 import {Address} from '../domains'
@@ -149,7 +149,7 @@ export class FusionSwapContract {
                 },
                 {
                     // resolver_access
-                    pubkey: getPda(Whitelist.ADDRESS, [
+                    pubkey: getPda(WhitelistContract.ADDRESS, [
                         new TextEncoder().encode('resolver_access'),
                         accounts.taker.toBuffer()
                     ]),

@@ -20,7 +20,7 @@ import {Address, AuctionDetails, FusionOrder, FusionSwapContract} from '../src'
 import {id} from '../src/utils/id'
 import {now} from '../src/utils/time/now'
 import {getAta} from '../src/utils/addresses/ata'
-import {Whitelist} from '../src/contracts/whitelist'
+import {WhitelistContract} from '../src/contracts/whitelist-contract'
 
 describe('FusionSwap', () => {
     const srcToken = Keypair.generate()
@@ -28,7 +28,9 @@ describe('FusionSwap', () => {
     const maker = Keypair.generate()
     const taker = Keypair.generate()
     const owner = Keypair.generate()
-    const whitelistProgramId = new PublicKey(Whitelist.ADDRESS.toBuffer())
+    const whitelistProgramId = new PublicKey(
+        WhitelistContract.ADDRESS.toBuffer()
+    )
     const fusionSwapProgramId = new PublicKey(
         FusionSwapContract.ADDRESS.toBuffer()
     )
