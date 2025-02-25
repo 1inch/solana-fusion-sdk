@@ -29,7 +29,7 @@ jobs:
 
       - name: Install Solana CLI (beta) # required for integration tests
         run: |
-          sh -c "$(curl -sSfL https://release.solana.com/beta/install)"
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
           echo "/home/runner/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
 
       - name: Auth in GitHub private registry npm
