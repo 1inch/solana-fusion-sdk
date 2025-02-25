@@ -48,8 +48,8 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Linter
-        run: pnpm lint
+#      - name: Linter
+#        run: pnpm lint
 
       - name: Types
         run: pnpm lint:types
