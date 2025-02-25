@@ -125,6 +125,10 @@ export class FusionOrder {
         return startTime + duration
     }
 
+    get auctionDetails(): AuctionDetails {
+        return this.orderConfig.dutchAuctionData
+    }
+
     get id(): number {
         return this.orderConfig.id
     }
