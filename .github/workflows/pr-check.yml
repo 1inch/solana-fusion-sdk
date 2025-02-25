@@ -37,11 +37,11 @@ jobs:
           path: |
             ~/.cache/solana/
             ~/.local/share/solana/
-          key: solana-cli-${{ runner.os }}-build-${{ vars.SOLANA_CLI_VER }}
+          key: solana-cli-${{ runner.os }}-build-${{ env.SOLANA_CLI_VER }}
 
       - name: Install Solana CLI (beta) # required for integration tests
         run: |
-          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+          sh -c "$(curl -sSfL https://release.anza.xyz/v${{ env.SOLANA_CLI_VER }}/install)"
           echo "/home/runner/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
 
       - name: Cache Cargo dependencies
@@ -57,7 +57,7 @@ jobs:
           key: rustup-${{ runner.os }}
 
       - name: Install Anchor
-        run: npm i -g @coral-xyz/anchor-cli@${{ vars.ANCHOR_VER }}
+        run: npm i -g @coral-xyz/anchor-cli@${{ env.ANCHOR_VER }}
         shell: bash
 
 #      - name: Install Anchor # required for integration tests
