@@ -53,6 +53,13 @@ jobs:
         with:
           workspaces: "./contracts/fusion-contract"
 
+      - name: Cache Rustup
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup
+          key: rustup-${{ runner.os }}
+
       - name: Install Anchor
         run: npm i -g @coral-xyz/anchor-cli@${{ vars.ANCHOR_VER }}
         shell: bash
