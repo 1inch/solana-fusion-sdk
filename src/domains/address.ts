@@ -27,16 +27,46 @@ export class Address implements AddressLike {
         'So11111111111111111111111111111111111111112'
     )
 
-    constructor(public readonly value: string) {
-        try {
-            const decoded = bs58.decode(value)
+    private readonly buf: Uint8Array
 
-            if (decoded.length !== 32) {
+    constructor(value: string) {
+        try {
+            this.buf = bs58.decode(value)
+
+            if (this.buf.length !== 32) {
                 throw ''
             }
         } catch {
             throw new Error(`${value} is not a valid address.`)
         }
+    }
+
+    static fromUnknown(val: unknown): Address {
+        if (!val) {
+            throw new Error('invalid address')
+        }
+
+        if (typeof val === 'string') {
+            return new Address(val)
+        }
+
+        if (typeof val === 'bigint') {
+            return Address.fromBigInt(val)
+        }
+
+        if (
+            typeof val === 'object' &&
+            'toBuffer' in val &&
+            typeof val.toBuffer === 'function'
+        ) {
+            const buffer = val.toBuffer()
+
+            if (buffer instanceof Buffer || buffer instanceof Uint8Array) {
+                return Address.fromBuffer(buffer)
+            }
+        }
+
+        throw new Error('invalid address')
     }
 
     static unique(): Address {
@@ -60,6 +90,10 @@ export class Address implements AddressLike {
     }
 
     public toBuffer(): Buffer {
-        return Buffer.from(bs58.decode(this.value))
+        return Buffer.from(this.buf)
+    }
+
+    public equal(other: Address): boolean {
+        return this.toBuffer().equals(other.toBuffer())
     }
 }

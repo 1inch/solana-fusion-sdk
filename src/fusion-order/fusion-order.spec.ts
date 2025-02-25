@@ -2,10 +2,11 @@ import {FusionOrder} from './fusion-order'
 import {AuctionDetails} from './auction-details'
 import {Address} from '../domains'
 import {now} from '../utils/time/now'
+import {FusionSwapContract} from '../contracts'
 
 describe('Fusion Order', () => {
-    it('should create fusion order', () => {
-        new FusionOrder(
+    it('should decode fusion order from instruction', () => {
+        const order = new FusionOrder(
             {
                 srcMint: Address.WRAPPED_NATIVE,
                 dstMint: new Address(
@@ -20,7 +21,12 @@ describe('Fusion Order', () => {
             AuctionDetails.noAuction(now(), 180)
         )
 
-        // todo: add assert
+        const ix = FusionSwapContract.default().create(order, {
+            maker: Address.fromBigInt(1n),
+            srcTokenProgram: Address.TOKEN_PROGRAM_ID
+        })
+
+        expect(FusionOrder.fromCreateInstruction(ix)).toEqual(order)
     })
     // it('should create fusion order with fees', () => {
     //     const extensionContract = new Address(

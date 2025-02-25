@@ -1,17 +1,20 @@
-import {BN} from '@coral-xyz/anchor'
+import {BN, BorshCoder} from '@coral-xyz/anchor'
 import * as borsh from 'borsh'
 import * as crypto from 'node:crypto'
 import {Buffer} from 'buffer'
+import assert from 'assert'
 import {AuctionDetails} from './auction-details'
 
 import {FeeConfig} from './fee-config'
 import {OrderInfoData} from './types'
-import {Address, AddressLike} from '../domains'
+import {Address, AddressLike, Bps} from '../domains'
 import {AmountCalculator, AuctionCalculator} from '../amount-calculator'
 import {FeeCalculator} from '../amount-calculator/fee-calculator/fee-calculator'
 import {FusionSwapContract} from '../contracts'
 import {getPda} from '../utils/addresses/pda'
 import {getAta} from '../utils/addresses/ata'
+import {TransactionInstruction} from '../contracts/transaction-instruction'
+import {IDL} from '../idl/fusion-swap'
 
 export class FusionOrder {
     private static DefaultExtra = {
@@ -128,6 +131,73 @@ export class FusionOrder {
 
     get unwrapToNative(): boolean {
         return this.orderConfig.nativeDstAsset
+    }
+
+    static fromCreateInstruction(ix: TransactionInstruction): FusionOrder {
+        const _ix = new BorshCoder(IDL).instruction.decode(ix.data)
+
+        if (!_ix || _ix.name !== 'create') {
+            throw new Error('invalid instruction')
+        }
+
+        assert('order' in _ix.data)
+
+        const reducedConfig = _ix.data.order as ReducedOrderConfig
+
+        const srcMint = ix.accounts[1]
+        const dstMint = ix.accounts[2]
+        const receiverAccMeta = ix.accounts[4]
+        const protocolDstAta = ix.accounts[7]
+        const integratorDstAta = ix.accounts[8]
+
+        expect(receiverAccMeta)
+        expect(srcMint)
+        expect(dstMint)
+        expect(protocolDstAta)
+        expect(integratorDstAta)
+
+        const {dutchAuctionData: auction, fee} = reducedConfig
+
+        const orderExpirationDelay =
+            reducedConfig.expirationTime - auction.duration - auction.startTime
+
+        return new FusionOrder(
+            {
+                srcMint: srcMint.pubkey,
+                dstMint: dstMint.pubkey,
+                id: reducedConfig.id,
+                srcAmount: BigInt(reducedConfig.srcAmount.toString()),
+                minDstAmount: BigInt(reducedConfig.minDstAmount.toString()),
+                estimatedDstAmount: BigInt(
+                    reducedConfig.estimatedDstAmount.toString()
+                ),
+                receiver: receiverAccMeta.pubkey
+            },
+            new AuctionDetails({
+                startTime: auction.startTime,
+                duration: auction.duration,
+                initialRateBump: auction.initialRateBump,
+                points: auction.pointsAndTimeDeltas.map((p) => ({
+                    coefficient: p.rateBump,
+                    delay: p.timeDelta
+                }))
+            }),
+            {
+                unwrapNative: reducedConfig.nativeDstAsset,
+                orderExpirationDelay,
+                fees: new FeeConfig(
+                    protocolDstAta.pubkey.equal(ix.programId)
+                        ? null
+                        : protocolDstAta.pubkey,
+                    integratorDstAta.pubkey.equal(ix.programId)
+                        ? null
+                        : integratorDstAta.pubkey,
+                    Bps.fromFraction(fee.protocolFee, FeeConfig.BASE_1E5),
+                    Bps.fromFraction(fee.integratorFee, FeeConfig.BASE_1E5),
+                    Bps.fromFraction(fee.surplusPercentage, FeeConfig.BASE_1E2)
+                )
+            }
+        )
     }
 
     public build(): OrderConfig {
