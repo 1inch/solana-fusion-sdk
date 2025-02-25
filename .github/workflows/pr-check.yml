@@ -39,7 +39,7 @@ jobs:
       - name: Cache Cargo dependencies
         uses: Swatinem/rust-cache@v2
         with:
-          cache-targets: "./contracts/fusion-contract"
+          workspaces: "./contracts/fusion-contract"
 
       - name: Install Anchor
         run: npm i -g @coral-xyz/anchor-cli@0.30.1
