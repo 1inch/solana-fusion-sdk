@@ -13,5 +13,6 @@
         "test",
         "dist",
         "**/*spec.ts"
-    ]
+    ],
+    "include": ["./src/**/*.ts", "./src/**/*.json"]
 }
