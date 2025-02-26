@@ -198,7 +198,7 @@ describe('FusionSwap', () => {
 
         expect(srcEscrowAta).toEqual(-srcTakerAta)
         expect(dstMakerAta).toEqual(-dstTakerAta)
-        expect(dstMakerAta).toEqual(order.dstAmount)
+        expect(dstMakerAta).toEqual(order.minDstAmount)
         expect(srcTakerAta).toEqual(order.srcAmount)
         // endregion fill
     })

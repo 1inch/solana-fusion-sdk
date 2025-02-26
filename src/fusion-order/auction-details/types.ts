@@ -1,6 +1,6 @@
 export type AuctionPoint = {
     /**
-     * point in time of this point relatively to previous point
+     * point in time of this point relatively to previous point. In secs
      */
     delay: number
     /**

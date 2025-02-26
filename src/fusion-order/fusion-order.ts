@@ -85,8 +85,12 @@ export class FusionOrder {
         return this.orderConfig.srcMint
     }
 
-    get dstAmount(): bigint {
+    get minDstAmount(): bigint {
         return this.orderConfig.minDstAmount
+    }
+
+    get estimatedDstAmount(): bigint {
+        return this.orderConfig.estimatedDstAmount
     }
 
     get srcAmount(): bigint {
@@ -360,7 +364,7 @@ export class FusionOrder {
         const takingAmount = AmountCalculator.calcTakingAmount(
             makingAmount,
             this.srcAmount,
-            this.dstAmount
+            this.minDstAmount
         )
 
         return this.getCalculator().getRequiredTakingAmount(takingAmount, time)
