@@ -6,7 +6,8 @@
         "module": "ESNext",
         "moduleResolution": "Bundler",
         "forceConsistentCasingInFileNames": true,
-        "baseUrl": "./src"
+        "baseUrl": "./src",
+        "removeComments": false
     },
     "include": ["./src/**/*.ts", "./src/**/*.json", "./scripts/**/*.ts", "./tests/**/*.ts"]
 }
