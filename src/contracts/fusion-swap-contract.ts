@@ -285,7 +285,7 @@ export class FusionSwapContract {
             ],
             this.coder.instruction.encode('fill', {
                 reducedOrder: order.asReduced(),
-                amount: new BN(amount)
+                amount: new BN(amount.toString())
             })
         )
     }
