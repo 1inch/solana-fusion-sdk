@@ -48,6 +48,9 @@ importers:
       '@swc/jest':
         specifier: 0.2.37
         version: 0.2.37(@swc/core@1.10.18(@swc/helpers@0.5.15))
+      '@types/bn.js':
+        specifier: 5.1.6
+        version: 5.1.6
       '@types/jest':
         specifier: 29.5.14
         version: 29.5.14
@@ -116,6 +119,9 @@ packages:
     engines: {node: '>=18.16.0'}
     peerDependencies:
       assert: ^2.0.0
+    peerDependenciesMeta:
+      assert:
+        optional: true
 
   '@1inch/eslint-config@3.0.7':
     resolution: {integrity: sha512-2qsAgDb+fRpSbuHhKz9rChWQx70Xp59K7by72nCbuK6y8/fx7YDokas9ujOZ0nfj0dGUM5xWGB4EXvdWpqcvfA==, tarball: https://npm.pkg.github.com/download/@1inch/eslint-config/3.0.7/5774b1fcbdb11e487651d358463f9976942cf482}
@@ -883,6 +889,9 @@ packages:
 
   '@types/babel__traverse@7.20.6':
     resolution: {integrity: sha512-r1bzfrm0tomOI8g1SzvCaQHo6Lcv6zu0EA+W2kHrt8dyrHQxGzBBL4kdkzIS+jBMV+EYcMAEAqXqYaLJq5rOZg==}
+
+  '@types/bn.js@5.1.6':
+    resolution: {integrity: sha512-Xh8vSwUeMKeYYrj3cX4lGQgFSF/N03r+tv4AiLl1SucqV+uTQpxRcnM8AkXKHwYP9ZPXOYXRr2KPXpVlIvqh9w==}
 
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
@@ -2865,7 +2874,7 @@ packages:
 snapshots:
 
   '@1inch/byte-utils@3.1.0(assert@2.1.0)':
-    dependencies:
+    optionalDependencies:
       assert: 2.1.0
 
   '@1inch/eslint-config@3.0.7(5da74aab0cd20b4f774934cced23856d)':
@@ -3744,6 +3753,10 @@ snapshots:
     dependencies:
       '@babel/types': 7.26.9
 
+  '@types/bn.js@5.1.6':
+    dependencies:
+      '@types/node': 22.13.4
+
   '@types/connect@3.4.38':
     dependencies:
       '@types/node': 22.13.4
@@ -4010,6 +4023,7 @@ snapshots:
       object-is: 1.1.6
       object.assign: 4.1.7
       util: 0.12.5
+    optional: true
 
   async-function@1.0.0: {}
 
@@ -4878,6 +4892,7 @@ snapshots:
     dependencies:
       call-bound: 1.0.3
       has-tostringtag: 1.0.2
+    optional: true
 
   is-array-buffer@3.0.5:
     dependencies:
@@ -4952,6 +4967,7 @@ snapshots:
     dependencies:
       call-bind: 1.0.8
       define-properties: 1.2.1
+    optional: true
 
   is-number-object@1.1.1:
     dependencies:
@@ -5505,6 +5521,7 @@ snapshots:
     dependencies:
       call-bind: 1.0.8
       define-properties: 1.2.1
+    optional: true
 
   object-keys@1.1.1: {}
 
@@ -6026,6 +6043,7 @@ snapshots:
       is-generator-function: 1.1.0
       is-typed-array: 1.1.15
       which-typed-array: 1.1.18
+    optional: true
 
   uuid@8.3.2: {}
 

@@ -273,6 +273,46 @@ export class FusionOrder {
         )
     }
 
+    static fromJSON(json: FusionOrderJSON): FusionOrder {
+        const {dutchAuctionData: auction, fee} = json
+        const orderExpirationDelay =
+            json.expirationTime - auction.duration - auction.startTime
+
+        return new FusionOrder(
+            {
+                srcMint: new Address(json.srcMint),
+                dstMint: new Address(json.dstMint),
+                id: json.id,
+                srcAmount: BigInt(json.srcAmount),
+                minDstAmount: BigInt(json.minDstAmount),
+                estimatedDstAmount: BigInt(json.estimatedDstAmount),
+                receiver: new Address(json.receiver)
+            },
+            new AuctionDetails({
+                startTime: auction.startTime,
+                duration: auction.duration,
+                initialRateBump: auction.initialRateBump,
+                points: auction.pointsAndTimeDeltas.map((p) => ({
+                    coefficient: p.rateBump,
+                    delay: p.timeDelta
+                }))
+            }),
+            {
+                unwrapNative: json.nativeDstAsset,
+                orderExpirationDelay,
+                fees: new FeeConfig(
+                    fee.protocolDstAta ? new Address(fee.protocolDstAta) : null,
+                    fee.integratorDstAta
+                        ? new Address(fee.integratorDstAta)
+                        : null,
+                    Bps.fromFraction(fee.protocolFee, FeeConfig.BASE_1E5),
+                    Bps.fromFraction(fee.integratorFee, FeeConfig.BASE_1E5),
+                    Bps.fromFraction(fee.surplusPercentage, FeeConfig.BASE_1E2)
+                )
+            }
+        )
+    }
+
     public build(): OrderConfig {
         const {fees} = this.orderConfig
 
@@ -296,9 +336,11 @@ export class FusionOrder {
 
         return {
             id: this.orderConfig.id,
-            srcAmount: new BN(this.orderConfig.srcAmount),
-            minDstAmount: new BN(this.orderConfig.minDstAmount),
-            estimatedDstAmount: new BN(this.orderConfig.estimatedDstAmount),
+            srcAmount: new BN(this.orderConfig.srcAmount.toString()),
+            minDstAmount: new BN(this.orderConfig.minDstAmount.toString()),
+            estimatedDstAmount: new BN(
+                this.orderConfig.estimatedDstAmount.toString()
+            ),
             expirationTime: this.orderConfig.expirationTime,
             nativeDstAsset: this.orderConfig.nativeDstAsset,
             fee: {
@@ -318,6 +360,31 @@ export class FusionOrder {
                     rateBump: p.coefficient,
                     timeDelta: p.delay
                 }))
+            }
+        }
+    }
+
+    public toJSON(): FusionOrderJSON {
+        const order = this.build()
+
+        const {protocolDstAta, integratorDstAta} = order.fee
+
+        return {
+            ...this.build(),
+            srcAmount: order.srcAmount.toString(),
+            estimatedDstAmount: order.estimatedDstAmount.toString(),
+            minDstAmount: order.minDstAmount.toString(),
+            receiver: Address.fromBuffer(order.receiver).toString(),
+            srcMint: Address.fromBuffer(order.srcMint).toString(),
+            dstMint: Address.fromBuffer(order.dstMint).toString(),
+            fee: {
+                ...order.fee,
+                protocolDstAta: protocolDstAta
+                    ? Address.fromBuffer(protocolDstAta).toString()
+                    : null,
+                integratorDstAta: integratorDstAta
+                    ? Address.fromBuffer(integratorDstAta).toString()
+                    : null
             }
         }
     }
@@ -538,6 +605,34 @@ type OrderConfig = ReducedOrderConfig & {
     fee: ReducedOrderConfig['fee'] & {
         protocolDstAta: Buffer | null
         integratorDstAta: Buffer | null
+    }
+}
+
+export type FusionOrderJSON = {
+    id: number
+    receiver: string
+    srcMint: string
+    dstMint: string
+    srcAmount: string
+    minDstAmount: string
+    estimatedDstAmount: string
+    expirationTime: number
+    nativeDstAsset: boolean
+    fee: {
+        protocolDstAta: string | null
+        integratorDstAta: string | null
+        protocolFee: number
+        integratorFee: number
+        surplusPercentage: number
+    }
+    dutchAuctionData: {
+        startTime: number
+        duration: number
+        initialRateBump: number
+        pointsAndTimeDeltas: {
+            rateBump: number
+            timeDelta: number
+        }[]
     }
 }
 
