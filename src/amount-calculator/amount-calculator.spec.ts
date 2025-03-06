@@ -1,49 +1,72 @@
+import {AmountCalculator} from './amount-calculator'
+import {AuctionCalculator} from './auction-calculator'
+import {FeeCalculator} from './fee-calculator/fee-calculator'
+import {now} from '../utils'
+import {AuctionDetails} from '../fusion-order'
+import {Bps} from '../domains'
+
 describe('AmountCalculator', () => {
-    it('should work', () => {})
-    // it('should correct extract fee', () => {
-    //     const integratorFeeBps = new Bps(6n) // 60% from 10bps
-    //     const calculator = new AmountCalculator(
-    //         new AuctionCalculator(1738650250n, 180n, 1218519n, [
-    //             {coefficient: 609353, delay: 180}
-    //         ]),
-    //         new FeeCalculator(
-    //             Fees.integratorFee(
-    //                 new IntegratorFee(
-    //                     new Address(
-    //                         '0x8e097e5e0493de033270a01b324caf31f464dc67'
-    //                     ),
-    //                     new Address(
-    //                         '0x90cbe4bdd538d6e9b379bff5fe72c3d67a521de5'
-    //                     ),
-    //                     new Bps(10n),
-    //                     new Bps(6000n)
-    //                 )
-    //             ),
-    //             Whitelist.new(1738650226n, [
-    //                 {address: Address.fromBigInt(1n), allowFrom: 0n}
-    //             ])
-    //         )
-    //     )
-    //     const takingAmount = 100000n
-    //     const requiredTakingAmount = calculator.getRequiredTakingAmount(
-    //         Address.ZERO_ADDRESS,
-    //         takingAmount,
-    //         now(),
-    //         10n
-    //     )
-    //
-    //     const integratorFee = calculator.getIntegratorFee(
-    //         Address.ZERO_ADDRESS,
-    //         takingAmount,
-    //         now(),
-    //         10n
-    //     )
-    //
-    //     expect(
-    //         AmountCalculator.extractFeeAmount(
-    //             requiredTakingAmount,
-    //             integratorFeeBps
-    //         )
-    //     ).toEqual(integratorFee)
-    // })
+    it('should return total fee', () => {
+        const protocolFee = Bps.fromPercent(1)
+        const integratorFee = Bps.fromPercent(2)
+        const surplusShare = Bps.fromPercent(50)
+        const calculator = new AmountCalculator(
+            AuctionCalculator.fromAuctionData(
+                AuctionDetails.noAuction(now(), 120)
+            ),
+            new FeeCalculator(protocolFee, integratorFee, surplusShare)
+        )
+
+        const totalFee = calculator.getTotalFee(1000n, 500n, now())
+
+        expect(totalFee).toEqual(265n) // ((1000 - 10 - 20) - 500)*.5 + 10 + 20
+    })
+
+    it('should return integrator fee', () => {
+        const protocolFee = Bps.fromPercent(1)
+        const integratorFee = Bps.fromPercent(2)
+        const surplusShare = Bps.fromPercent(50)
+        const calculator = new AmountCalculator(
+            AuctionCalculator.fromAuctionData(
+                AuctionDetails.noAuction(now(), 120)
+            ),
+            new FeeCalculator(protocolFee, integratorFee, surplusShare)
+        )
+
+        const totalFee = calculator.getIntegratorFee(1000n, now())
+
+        expect(totalFee).toEqual(20n) // 1000 * 2%
+    })
+
+    it('should return protocol fee with no surplus', () => {
+        const protocolFee = Bps.fromPercent(1)
+        const integratorFee = Bps.fromPercent(2)
+        const surplusShare = Bps.fromPercent(50)
+        const calculator = new AmountCalculator(
+            AuctionCalculator.fromAuctionData(
+                AuctionDetails.noAuction(now(), 120)
+            ),
+            new FeeCalculator(protocolFee, integratorFee, surplusShare)
+        )
+
+        const totalFee = calculator.getProtocolFee(1000n, 1000n, now())
+
+        expect(totalFee).toEqual(10n) // 1000 * 1% (no surplus)
+    })
+
+    it('should return protocol fee with surplus', () => {
+        const protocolFee = Bps.fromPercent(1)
+        const integratorFee = Bps.fromPercent(2)
+        const surplusShare = Bps.fromPercent(50)
+        const calculator = new AmountCalculator(
+            AuctionCalculator.fromAuctionData(
+                AuctionDetails.noAuction(now(), 120)
+            ),
+            new FeeCalculator(protocolFee, integratorFee, surplusShare)
+        )
+
+        const totalFee = calculator.getProtocolFee(1000n, 500n, now())
+
+        expect(totalFee).toEqual(245n) // ((1000 - 10 - 20) - 500)*.5 + 10
+    })
 })

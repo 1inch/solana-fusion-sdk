@@ -437,124 +437,66 @@ export class FusionOrder {
         return this.getCalculator().getRequiredTakingAmount(takingAmount, time)
     }
 
-    // /**
-    //  * How much user will receive in taker asset
-    //  *
-    //  * @param taker who will fill order
-    //  * @param makingAmount maker swap amount
-    //  * @param time block time at which order will be filled
-    //  * @param blockBaseFee base fee of block at which order will be filled
-    //  */
-    // public getUserReceiveAmount(
-    //     taker: Address,
-    //     makingAmount: bigint,
-    //     time: bigint,
-    //     blockBaseFee = 0n
-    // ): bigint {
-    //     const takingAmount = calcTakingAmount(
-    //         makingAmount,
-    //         this.makingAmount,
-    //         this.takingAmount
-    //     )
-    //
-    //     return this.getAmountCalculator().getUserTakingAmountAmount(
-    //         taker,
-    //         takingAmount,
-    //         time,
-    //         blockBaseFee
-    //     )
-    // }
+    /**
+     * How much user will receive in dst token
+     *
+     * @param makingAmount maker swap amount
+     * @param time block time at which order will be filled
+     */
+    public getUserReceiveAmount(makingAmount: bigint, time: number): bigint {
+        const takingAmount = AmountCalculator.calcTakingAmount(
+            makingAmount,
+            this.srcAmount,
+            this.minDstAmount
+        )
 
-    // /**
-    //  * Fee in `takerAsset` which integrator gets to integrator wallet
-    //  *
-    //  * @param taker who will fill order
-    //  * @param makingAmount maker swap amount
-    //  * @param time block time at which order will be filled
-    //  * @param blockBaseFee base fee of block at which order will be filled
-    //  */
-    // public getIntegratorFee(
-    //     taker: Address,
-    //     time: bigint,
-    //     blockBaseFee = 0n,
-    //     makingAmount = this.makingAmount
-    // ): bigint {
-    //     const takingAmount = calcTakingAmount(
-    //         makingAmount,
-    //         this.makingAmount,
-    //         this.takingAmount
-    //     )
-    //
-    //     return (
-    //         this.getAmountCalculator().getIntegratorFee(
-    //             taker,
-    //             takingAmount,
-    //             time,
-    //             blockBaseFee
-    //         ) ?? 0n
-    //     )
-    // }
+        return this.getCalculator().getUserReceiveAmount(
+            takingAmount,
+            this.estimatedDstAmount,
+            time
+        )
+    }
 
-    // /**
-    //  * Fee in `takerAsset` which protocol gets as share from integrator fee
-    //  *
-    //  * @param taker who will fill order
-    //  * @param makingAmount maker swap amount
-    //  * @param time block time at which order will be filled
-    //  * @param blockBaseFee base fee of block at which order will be filled
-    //  */
-    // public getProtocolShareOfIntegratorFee(
-    //     taker: Address,
-    //     time: bigint,
-    //     blockBaseFee = 0n,
-    //     makingAmount = this.makingAmount
-    // ): bigint {
-    //     const takingAmount = calcTakingAmount(
-    //         makingAmount,
-    //         this.makingAmount,
-    //         this.takingAmount
-    //     )
-    //
-    //     return (
-    //         this.getAmountCalculator().getProtocolShareOfIntegratorFee(
-    //             taker,
-    //             takingAmount,
-    //             time,
-    //             blockBaseFee
-    //         ) ?? 0n
-    //     )
-    // }
+    /**
+     * Fee in `dstToken` which integrator gets to integrator ata account
+     *
+     * @param makingAmount maker swap amount
+     * @param time block time at which order will be filled
+     */
+    public getIntegratorFee(
+        time: number,
+        makingAmount = this.srcAmount
+    ): bigint {
+        const takingAmount = AmountCalculator.calcTakingAmount(
+            makingAmount,
+            this.srcAmount,
+            this.minDstAmount
+        )
 
-    // /**
-    //  * Fee in `takerAsset` which protocol gets
-    //  * It equals to `share from integrator fee plus resolver fee`
-    //  *
-    //  * @param taker who will fill order
-    //  * @param makingAmount maker swap amount
-    //  * @param time block time at which order will be filled
-    //  * @param blockBaseFee base fee of block at which order will be filled
-    //  */
-    // public getProtocolFee(
-    //     taker: Address,
-    //     time: bigint,
-    //     blockBaseFee = 0n,
-    //     makingAmount = this.makingAmount
-    // ): bigint {
-    //     const takingAmount = calcTakingAmount(
-    //         makingAmount,
-    //         this.makingAmount,
-    //         this.takingAmount
-    //     )
-    //
-    //     return (
-    //         this.getAmountCalculator().getProtocolFee(
-    //             taker,
-    //             takingAmount,
-    //             time,
-    //             blockBaseFee
-    //         ) ?? 0n
-    //     )
-    // }
+        return this.getCalculator().getIntegratorFee(takingAmount, time) ?? 0n
+    }
+
+    /**
+     * Fee in `dstToken` which protocol gets to ata account
+     *
+     * @param makingAmount maker swap amount
+     * @param time block time at which order will be filled
+     */
+    public getProtocolFee(time: number, makingAmount = this.srcAmount): bigint {
+        const takingAmount = AmountCalculator.calcTakingAmount(
+            makingAmount,
+            this.srcAmount,
+            this.minDstAmount
+        )
+
+        return (
+            this.getCalculator().getProtocolFee(
+                takingAmount,
+                this.estimatedDstAmount,
+                time
+            ) ?? 0n
+        )
+    }
 
     /**
      * Check is order expired at a given time
