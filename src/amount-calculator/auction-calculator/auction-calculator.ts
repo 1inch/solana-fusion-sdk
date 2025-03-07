@@ -1,5 +1,7 @@
+import {UINT_16_MAX} from '@1inch/byte-utils'
 import {AuctionDetails, AuctionPoint} from '../../fusion-order'
 import {mulDiv, Rounding} from '../../utils/math/mul-div'
+import {assertUInteger} from '../../utils'
 
 export class AuctionCalculator {
     public static RATE_BUMP_DENOMINATOR = 100_000n // 100%
@@ -9,7 +11,16 @@ export class AuctionCalculator {
         private readonly duration: number,
         private readonly initialRateBump: number,
         private readonly points: AuctionPoint[]
-    ) {}
+    ) {
+        assertUInteger(initialRateBump, UINT_16_MAX)
+        assertUInteger(startTime)
+        assertUInteger(duration)
+
+        points.forEach((point) => {
+            assertUInteger(point.delay, UINT_16_MAX)
+            assertUInteger(point.coefficient, UINT_16_MAX)
+        })
+    }
 
     get finishTime(): number {
         return this.startTime + this.duration
@@ -64,27 +75,28 @@ export class AuctionCalculator {
             return 0
         }
 
-        let currentRateBump = this.initialRateBump
-        let currentPointTime = this.startTime
+        let currentRateBump = BigInt(this.initialRateBump)
+        let currentPointTime = BigInt(this.startTime)
+        const blockTimeBN = BigInt(blockTime)
 
         for (const {coefficient: nextRateBump, delay} of this.points) {
-            const nextPointTime = delay + currentPointTime
+            const nextPointTime = BigInt(delay) + currentPointTime
 
-            if (blockTime <= nextPointTime) {
-                return (
-                    ((blockTime - currentPointTime) * nextRateBump +
-                        (nextPointTime - blockTime) * currentRateBump) /
-                    (nextPointTime - currentPointTime)
+            if (blockTimeBN <= nextPointTime) {
+                return Number(
+                    ((blockTimeBN - currentPointTime) * BigInt(nextRateBump) +
+                        (nextPointTime - blockTimeBN) * currentRateBump) /
+                        (nextPointTime - currentPointTime)
                 )
             }
 
             currentPointTime = nextPointTime
-            currentRateBump = nextRateBump
+            currentRateBump = BigInt(nextRateBump)
         }
 
-        return (
-            ((auctionFinishTime - blockTime) * currentRateBump) /
-            (auctionFinishTime - currentPointTime)
+        return Number(
+            ((BigInt(auctionFinishTime) - blockTimeBN) * currentRateBump) /
+                (BigInt(auctionFinishTime) - currentPointTime)
         )
     }
 }
