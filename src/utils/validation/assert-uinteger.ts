@@ -1,7 +1,7 @@
 import {UINT_32_MAX} from '@1inch/byte-utils'
 
-export function assertUInteger(val: number, max = UINT_32_MAX): void {
-    if (!Number.isInteger(val)) {
+export function assertUInteger(val: number | bigint, max = UINT_32_MAX): void {
+    if (typeof val === 'number' && !Number.isInteger(val)) {
         throw new Error(`Expected ${val} to be an integer`)
     }
 

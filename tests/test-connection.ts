@@ -40,7 +40,7 @@ export class TestConnection {
 
         assert(transaction.signature)
 
-        await sleep(10) // IDK, for some reason the bank client can't find tx without this sleep
+        await sleep(100) // IDK, for some reason the bank client can't find tx without this sleep
 
         return bs58.encode(transaction.signature) as TransactionSignature
     }
