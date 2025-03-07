@@ -168,13 +168,13 @@ export class FusionOrder {
 
         const reducedConfig = _ix.data.order as ReducedOrderConfig
 
-        const srcMint = ix.accounts[1]
-        const dstMint = ix.accounts[2]
-        const receiverAccMeta = ix.accounts[4]
-        const protocolDstAta = ix.accounts[7]
-        const integratorDstAta = ix.accounts[8]
+        const srcMint = ix.accounts[2]
+        const dstMint = ix.accounts[7]
+        const receiverAcc = ix.accounts[8]
+        const protocolDstAta = ix.accounts[10]
+        const integratorDstAta = ix.accounts[11]
 
-        assert(receiverAccMeta)
+        assert(receiverAcc)
         assert(srcMint)
         assert(dstMint)
         assert(protocolDstAta)
@@ -215,7 +215,7 @@ export class FusionOrder {
                 estimatedDstAmount: BigInt(
                     reducedConfig.estimatedDstAmount.toString()
                 ),
-                receiver: receiverAccMeta.pubkey
+                receiver: receiverAcc.pubkey
             },
             new AuctionDetails({
                 startTime: auction.startTime,

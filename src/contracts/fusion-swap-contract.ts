@@ -35,31 +35,31 @@ export class FusionSwapContract {
             this.programId,
             [
                 {
-                    // system_program
+                    // 0. system_program
                     pubkey: Address.SYSTEM_PROGRAM_ID,
                     isWritable: false,
                     isSigner: false
                 },
                 {
-                    // escrow
+                    // 1. escrow
                     pubkey: escrow,
                     isWritable: false,
                     isSigner: false
                 },
                 {
-                    // src_mint
+                    // 2. src_mint
                     pubkey: order.srcMint,
                     isWritable: false,
                     isSigner: false
                 },
                 {
-                    // src_token_program
+                    // 3. src_token_program
                     pubkey: accounts.srcTokenProgram,
                     isWritable: false,
                     isSigner: false
                 },
                 {
-                    // escrow_src_ata
+                    // 4. escrow_src_ata
                     pubkey: getAta(
                         escrow,
                         order.srcMint,
@@ -69,13 +69,13 @@ export class FusionSwapContract {
                     isSigner: false
                 },
                 {
-                    // maker
+                    // 5. maker
                     pubkey: accounts.maker,
                     isSigner: true,
                     isWritable: true
                 },
                 {
-                    // maker_src_ata
+                    // 6. maker_src_ata
                     pubkey: getAta(
                         accounts.maker,
                         order.srcMint,
@@ -85,31 +85,31 @@ export class FusionSwapContract {
                     isSigner: false
                 },
                 {
-                    // dst_mint
+                    // 7. dst_mint
                     pubkey: order.dstMint,
                     isWritable: false,
                     isSigner: false
                 },
                 {
-                    // maker_receiver
+                    // 8. maker_receiver
                     pubkey: order.receiver,
                     isWritable: false,
                     isSigner: false
                 },
                 {
-                    // associated_token_program
+                    // 9. associated_token_program
                     pubkey: Address.ASSOCIATED_TOKE_PROGRAM_ID,
                     isWritable: false,
                     isSigner: false
                 },
                 {
-                    // protocol_dst_ata
+                    // 10. protocol_dst_ata
                     pubkey: this.optional(order.fees?.protocolDstAta),
                     isWritable: false,
                     isSigner: false
                 },
                 {
-                    // integrator_dst_ata
+                    // 11. integrator_dst_ata
                     pubkey: this.optional(order.fees?.integratorDstAta),
                     isWritable: false,
                     isSigner: false
