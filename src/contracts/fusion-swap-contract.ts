@@ -130,8 +130,11 @@ export class FusionSwapContract {
             srcTokenProgram: Address
             dstTokenProgram: Address
             takerSrcAccount?: Address
+            whitelist?: Address
         }
     ): TransactionInstruction {
+        const whitelist = accounts.whitelist || WhitelistContract.ADDRESS
+
         const escrow = getPda(this.programId, [
             new TextEncoder().encode('escrow'),
             accounts.maker.toBuffer(),
@@ -149,7 +152,7 @@ export class FusionSwapContract {
                 },
                 {
                     // resolver_access
-                    pubkey: getPda(WhitelistContract.ADDRESS, [
+                    pubkey: getPda(whitelist, [
                         new TextEncoder().encode('resolver_access'),
                         accounts.taker.toBuffer()
                     ]),
