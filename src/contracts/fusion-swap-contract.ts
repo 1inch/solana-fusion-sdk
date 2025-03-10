@@ -1,4 +1,5 @@
 import {BN, BorshCoder} from '@coral-xyz/anchor'
+import assert from 'assert'
 import {TransactionInstruction} from './transaction-instruction'
 import {WhitelistContract} from './whitelist-contract'
 import {getAta} from '../utils/addresses/ata'
@@ -289,6 +290,216 @@ export class FusionSwapContract {
             this.coder.instruction.encode('fill', {
                 reducedOrder: order.asReduced(),
                 amount: new BN(amount.toString())
+            })
+        )
+    }
+
+    /**
+     * Returns cancel instruction which only maker can submit
+     */
+    public cancelOwnOrder(
+        order: FusionOrder,
+        accounts: {
+            maker: Address
+            srcTokenProgram: Address
+        }
+    ): TransactionInstruction {
+        const orderHash = order.getOrderHash()
+        const escrow = getPda(this.programId, [
+            new TextEncoder().encode('escrow'),
+            accounts.maker.toBuffer(),
+            orderHash
+        ])
+
+        return new TransactionInstruction(
+            this.programId,
+            [
+                {
+                    // 1. maker
+                    pubkey: accounts.maker,
+                    isSigner: true,
+                    isWritable: true
+                },
+                {
+                    // 2. src_mint
+                    pubkey: order.srcMint,
+                    isWritable: false,
+                    isSigner: false
+                },
+                {
+                    // 3. escrow
+                    pubkey: escrow,
+                    isWritable: false,
+                    isSigner: false
+                },
+                {
+                    // 4. escrow_src_ata
+                    pubkey: getAta(
+                        escrow,
+                        order.srcMint,
+                        accounts.srcTokenProgram
+                    ),
+                    isWritable: true,
+                    isSigner: false
+                },
+                {
+                    // 5. maker_src_ata
+                    pubkey: getAta(
+                        accounts.maker,
+                        order.srcMint,
+                        accounts.srcTokenProgram
+                    ),
+                    isWritable: true,
+                    isSigner: false
+                },
+                {
+                    // 6. src_token_program
+                    pubkey: accounts.srcTokenProgram,
+                    isWritable: false,
+                    isSigner: false
+                }
+            ],
+            this.coder.instruction.encode('cancel', {
+                orderHash
+            })
+        )
+    }
+
+    /**
+     * Returns cancel instruction which only resolver with access token can submit
+     */
+    public cancelOrderByResolver(
+        order: FusionOrder,
+        accounts: {
+            maker: Address
+            resolver: Address
+            srcTokenProgram: Address
+            whitelist?: Address
+        }
+    ): TransactionInstruction {
+        assert(
+            order.resolverCancellationConfig,
+            'order can not be cancelled by resolver'
+        )
+
+        const textEncoder = new TextEncoder()
+        const whitelist = accounts.whitelist || WhitelistContract.ADDRESS
+
+        const orderHash = order.getOrderHash()
+        const escrow = getPda(this.programId, [
+            textEncoder.encode('escrow'),
+            accounts.maker.toBuffer(),
+            orderHash
+        ])
+
+        return new TransactionInstruction(
+            this.programId,
+            [
+                {
+                    // 1. resolver
+                    pubkey: accounts.resolver,
+                    isSigner: true,
+                    isWritable: true
+                },
+                {
+                    // 2. resolver_access
+                    pubkey: getPda(whitelist, [
+                        textEncoder.encode('resolver_access'),
+                        accounts.resolver.toBuffer()
+                    ]),
+                    isWritable: false,
+                    isSigner: false
+                },
+                {
+                    // 3. maker
+                    pubkey: accounts.maker,
+                    isWritable: true,
+                    isSigner: false
+                },
+                {
+                    // 4. maker_receiver
+                    pubkey: order.receiver,
+                    isWritable: false,
+                    isSigner: false
+                },
+                {
+                    // 5. src_mint
+                    pubkey: order.srcMint,
+                    isWritable: false,
+                    isSigner: false
+                },
+                {
+                    // 6. dst_mint
+                    pubkey: order.dstMint,
+                    isWritable: false,
+                    isSigner: false
+                },
+                {
+                    // 7. escrow
+                    pubkey: escrow,
+                    isWritable: false,
+                    isSigner: false
+                },
+                {
+                    // 8. escrow_src_ata
+                    pubkey: getAta(
+                        escrow,
+                        order.srcMint,
+                        accounts.srcTokenProgram
+                    ),
+                    isWritable: true,
+                    isSigner: false
+                },
+                {
+                    // 9. maker_src_ata
+                    pubkey: getAta(
+                        accounts.maker,
+                        order.srcMint,
+                        accounts.srcTokenProgram
+                    ),
+                    isWritable: true,
+                    isSigner: false
+                },
+
+                // 10. protocol_dst_ata
+                order.unwrapToNative || !order.fees?.protocolDstAta
+                    ? {
+                          pubkey: this.programId,
+                          isWritable: false,
+                          isSigner: false
+                      }
+                    : {
+                          pubkey: order.fees.protocolDstAta,
+                          isWritable: true,
+                          isSigner: false
+                      },
+                // 11. integrator_dst_ata
+                order.unwrapToNative || !order.fees?.integratorDstAta
+                    ? {
+                          pubkey: this.programId,
+                          isWritable: false,
+                          isSigner: false
+                      }
+                    : {
+                          pubkey: order.fees.integratorDstAta,
+                          isWritable: true,
+                          isSigner: false
+                      },
+                {
+                    // 12. src token program
+                    pubkey: accounts.srcTokenProgram,
+                    isWritable: false,
+                    isSigner: false
+                },
+                {
+                    // 13. system_program
+                    pubkey: Address.SYSTEM_PROGRAM_ID,
+                    isWritable: false,
+                    isSigner: false
+                }
+            ],
+            this.coder.instruction.encode('cancelByResolver', {
+                reducedOrder: order.asReduced()
             })
         )
     }

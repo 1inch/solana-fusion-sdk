@@ -46,7 +46,7 @@
     "lint": "eslint  \"{src,apps,libs,test,tests}/**/*.ts\" --fix",
     "lint:types": "tsc --noEmit",
     "test": "TZ=UTC jest",
-    "test:integration": "TZ=UTC pnpm sync:programs && jest -c jest.integration.config.js",
+    "test:integration": "TZ=UTC jest -c jest.integration.config.js",
     "test:watch": "jest --watch",
     "changelog:generate": "changelog generate -a"
   },

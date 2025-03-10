@@ -8,7 +8,7 @@ import {AuctionDetails} from './auction-details'
 
 import {FeeConfig} from './fee-config'
 import {OrderInfoData} from './types'
-import {CancellationConfig} from './cancellation-config'
+import {ResolverCancellationConfig} from './resolver-cancellation-config'
 import {Address, AddressLike, Bps} from '../domains'
 import {AmountCalculator, AuctionCalculator} from '../amount-calculator'
 import {FeeCalculator} from '../amount-calculator/fee-calculator/fee-calculator'
@@ -21,7 +21,7 @@ export class FusionOrder {
         unwrapNative: false,
         orderExpirationDelay: 12,
         fees: FeeConfig.ZERO,
-        cancellationConfig: CancellationConfig.ALMOST_ZERO // to enable cancellation by resolver
+        resolverCancellationConfig: ResolverCancellationConfig.ALMOST_ZERO // to enable cancellation by resolver
     }
 
     private readonly orderConfig: {
@@ -33,7 +33,7 @@ export class FusionOrder {
         nativeDstAsset: boolean
         receiver: Address
         fees: FeeConfig
-        cancellationConfig: CancellationConfig
+        resolverCancellationConfig: ResolverCancellationConfig
         dutchAuctionData: AuctionDetails
         srcMint: Address
         dstMint: Address
@@ -50,11 +50,7 @@ export class FusionOrder {
              */
             orderExpirationDelay?: number
             fees?: FeeConfig
-            /**
-             * In seconds
-             * Default is 12s
-             */
-            cancellationConfig: CancellationConfig
+            resolverCancellationConfig?: ResolverCancellationConfig
         } = FusionOrder.DefaultExtra
     ) {
         const unwrapNative =
@@ -77,9 +73,9 @@ export class FusionOrder {
         assertUInteger(orderInfo.minDstAmount, UINT_64_MAX)
 
         const fees = extra.fees || FusionOrder.DefaultExtra.fees
-        const cancellationConfig =
-            extra.cancellationConfig ||
-            FusionOrder.DefaultExtra.cancellationConfig
+        const resolverCancellationConfig =
+            extra.resolverCancellationConfig ||
+            FusionOrder.DefaultExtra.resolverCancellationConfig
 
         this.orderConfig = {
             ...orderInfo,
@@ -87,12 +83,18 @@ export class FusionOrder {
             fees,
             nativeDstAsset: unwrapNative,
             expirationTime: deadline,
-            cancellationConfig
+            resolverCancellationConfig: resolverCancellationConfig
         }
     }
 
     get fees(): FeeConfig | null {
         return this.orderConfig.fees.isZero() ? null : this.orderConfig.fees
+    }
+
+    get resolverCancellationConfig(): ResolverCancellationConfig | null {
+        return this.orderConfig.resolverCancellationConfig.isZero()
+            ? null
+            : this.orderConfig.resolverCancellationConfig
     }
 
     get dstMint(): Address {
@@ -196,12 +198,8 @@ export class FusionOrder {
             Bps.fromFraction(fee.integratorFee, FeeConfig.BASE_1E5),
             Bps.fromFraction(fee.surplusPercentage, FeeConfig.BASE_1E2)
         )
-        const cancellationConfig = new CancellationConfig(
-            BigInt(reducedConfig.fee.minCancellationPremium.toString()),
-            Bps.fromFraction(
-                reducedConfig.fee.maxCancellationMultiplier,
-                CancellationConfig.BASE_1E3
-            ),
+        const resolverCancellationConfig = new ResolverCancellationConfig(
+            BigInt(reducedConfig.fee.maxCancellationPremium.toString()),
             reducedConfig.cancellationAuctionDuration
         )
 
@@ -230,7 +228,7 @@ export class FusionOrder {
                 unwrapNative: reducedConfig.nativeDstAsset,
                 orderExpirationDelay,
                 fees,
-                cancellationConfig
+                resolverCancellationConfig
             }
         )
     }
@@ -274,12 +272,8 @@ export class FusionOrder {
             Bps.fromFraction(fee.integratorFee, FeeConfig.BASE_1E5),
             Bps.fromFraction(fee.surplusPercentage, FeeConfig.BASE_1E2)
         )
-        const cancellationConfig = new CancellationConfig(
-            BigInt(reducedConfig.fee.minCancellationPremium.toString()),
-            Bps.fromFraction(
-                reducedConfig.fee.maxCancellationMultiplier,
-                CancellationConfig.BASE_1E3
-            ),
+        const resolverCancellationConfig = new ResolverCancellationConfig(
+            BigInt(reducedConfig.fee.maxCancellationPremium.toString()),
             reducedConfig.cancellationAuctionDuration
         )
 
@@ -308,7 +302,7 @@ export class FusionOrder {
                 unwrapNative: reducedConfig.nativeDstAsset,
                 orderExpirationDelay,
                 fees,
-                cancellationConfig
+                resolverCancellationConfig
             }
         )
     }
@@ -326,12 +320,8 @@ export class FusionOrder {
             Bps.fromFraction(fee.surplusPercentage, FeeConfig.BASE_1E2)
         )
 
-        const cancellationConfig = new CancellationConfig(
-            BigInt(fee.minCancellationPremium.toString()),
-            Bps.fromFraction(
-                fee.maxCancellationMultiplier,
-                CancellationConfig.BASE_1E3
-            ),
+        const resolverCancellationConfig = new ResolverCancellationConfig(
+            BigInt(fee.maxCancellationPremium.toString()),
             json.cancellationAuctionDuration
         )
 
@@ -358,7 +348,7 @@ export class FusionOrder {
                 unwrapNative: json.nativeDstAsset,
                 orderExpirationDelay,
                 fees,
-                cancellationConfig
+                resolverCancellationConfig
             }
         )
     }
@@ -385,7 +375,7 @@ export class FusionOrder {
         const {
             fees,
             dutchAuctionData: auction,
-            cancellationConfig
+            resolverCancellationConfig
         } = this.orderConfig
 
         return {
@@ -405,12 +395,8 @@ export class FusionOrder {
                 surplusPercentage: fees.surplusShare.toFraction(
                     FeeConfig.BASE_1E2
                 ),
-                maxCancellationMultiplier:
-                    cancellationConfig.maxCancellationMultiplier.toFraction(
-                        CancellationConfig.BASE_1E3
-                    ),
-                minCancellationPremium: new BN(
-                    cancellationConfig.minCancellationPremium.toString()
+                maxCancellationPremium: new BN(
+                    resolverCancellationConfig.maxCancellationPremium.toString()
                 )
             },
             dutchAuctionData: {
@@ -423,7 +409,7 @@ export class FusionOrder {
                 }))
             },
             cancellationAuctionDuration:
-                cancellationConfig.cancellationAuctionDuration
+                resolverCancellationConfig.cancellationAuctionDuration
         }
     }
 
@@ -448,8 +434,8 @@ export class FusionOrder {
                 integratorDstAta: integratorDstAta
                     ? Address.fromBuffer(integratorDstAta).toString()
                     : null,
-                minCancellationPremium:
-                    order.fee.minCancellationPremium.toString()
+                maxCancellationPremium:
+                    order.fee.maxCancellationPremium.toString()
             }
         }
     }
@@ -594,8 +580,7 @@ type ReducedOrderConfig = {
         protocolFee: number
         integratorFee: number
         surplusPercentage: number
-        minCancellationPremium: BN
-        maxCancellationMultiplier: number
+        maxCancellationPremium: BN
     }
     dutchAuctionData: {
         startTime: number
@@ -635,8 +620,7 @@ export type FusionOrderJSON = {
         protocolFee: number
         integratorFee: number
         surplusPercentage: number
-        minCancellationPremium: string
-        maxCancellationMultiplier: number
+        maxCancellationPremium: string
     }
     dutchAuctionData: {
         startTime: number
@@ -665,8 +649,7 @@ const OrderConfigSchema = {
                 protocolFee: 'u16',
                 integratorFee: 'u16',
                 surplusPercentage: 'u8',
-                minCancellationPremium: 'u64',
-                maxCancellationMultiplier: 'u16'
+                maxCancellationPremium: 'u64'
             }
         },
         dutchAuctionData: {
