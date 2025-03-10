@@ -22,6 +22,7 @@ import {now} from '../src/utils/time/now'
 import {getAta} from '../src/utils/addresses/ata'
 import {WhitelistContract} from '../src/contracts/whitelist-contract'
 
+// eslint-disable-next-line max-lines-per-function
 describe('FusionSwap', () => {
     const srcToken = Keypair.generate()
     const dstToken = Keypair.generate()
