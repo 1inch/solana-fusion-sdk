@@ -247,8 +247,8 @@ export class FusionOrder {
         const srcMint = ix.accounts[4]
         const dstMint = ix.accounts[5]
         const receiverAccMeta = ix.accounts[3]
-        const protocolDstAta = ix.accounts[9]
-        const integratorDstAta = ix.accounts[10]
+        const protocolDstAta = ix.accounts[15]
+        const integratorDstAta = ix.accounts[16]
 
         assert(receiverAccMeta)
         assert(srcMint)
