@@ -34,7 +34,16 @@ describe('Fusion Order', () => {
             dstTokenProgram: Address.TOKEN_PROGRAM_ID
         })
 
+        const cancelByResolerIx = contract.cancelOrderByResolver(order, {
+            maker: Address.fromBigInt(1n),
+            srcTokenProgram: Address.TOKEN_PROGRAM_ID,
+            resolver: Address.fromBigInt(1n)
+        })
+
         expect(FusionOrder.fromCreateInstruction(createIx)).toEqual(order)
         expect(FusionOrder.fromFillInstruction(fillIx)).toEqual(order)
+        expect(
+            FusionOrder.fromResolverCancelInstruction(cancelByResolerIx)
+        ).toEqual(order)
     })
 })

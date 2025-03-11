@@ -182,55 +182,14 @@ export class FusionOrder {
         assert(protocolDstAta)
         assert(integratorDstAta)
 
-        const {dutchAuctionData: auction, fee} = reducedConfig
-
-        const orderExpirationDelay =
-            reducedConfig.expirationTime - auction.duration - auction.startTime
-
-        const fees = new FeeConfig(
-            protocolDstAta.pubkey.equal(ix.programId)
-                ? null
-                : protocolDstAta.pubkey,
-            integratorDstAta.pubkey.equal(ix.programId)
-                ? null
-                : integratorDstAta.pubkey,
-            Bps.fromFraction(fee.protocolFee, FeeConfig.BASE_1E5),
-            Bps.fromFraction(fee.integratorFee, FeeConfig.BASE_1E5),
-            Bps.fromFraction(fee.surplusPercentage, FeeConfig.BASE_1E2)
-        )
-        const resolverCancellationConfig = new ResolverCancellationConfig(
-            BigInt(reducedConfig.fee.maxCancellationPremium.toString()),
-            reducedConfig.cancellationAuctionDuration
-        )
-
-        return new FusionOrder(
-            {
-                srcMint: srcMint.pubkey,
-                dstMint: dstMint.pubkey,
-                id: reducedConfig.id,
-                srcAmount: BigInt(reducedConfig.srcAmount.toString()),
-                minDstAmount: BigInt(reducedConfig.minDstAmount.toString()),
-                estimatedDstAmount: BigInt(
-                    reducedConfig.estimatedDstAmount.toString()
-                ),
-                receiver: receiverAcc.pubkey
-            },
-            new AuctionDetails({
-                startTime: auction.startTime,
-                duration: auction.duration,
-                initialRateBump: auction.initialRateBump,
-                points: auction.pointsAndTimeDeltas.map((p) => ({
-                    coefficient: p.rateBump,
-                    delay: p.timeDelta
-                }))
-            }),
-            {
-                unwrapNative: reducedConfig.nativeDstAsset,
-                orderExpirationDelay,
-                fees,
-                resolverCancellationConfig
-            }
-        )
+        return FusionOrder.fromReducedOrder(reducedConfig, {
+            srcMint: srcMint.pubkey,
+            receiver: receiverAcc.pubkey,
+            dstMint: dstMint.pubkey,
+            integratorDstAta: integratorDstAta.pubkey,
+            programId: ix.programId,
+            protocolDstAta: protocolDstAta.pubkey
+        })
     }
 
     static fromFillInstruction(ix: TransactionInstruction): FusionOrder {
@@ -256,18 +215,78 @@ export class FusionOrder {
         assert(protocolDstAta)
         assert(integratorDstAta)
 
+        return FusionOrder.fromReducedOrder(reducedConfig, {
+            srcMint: srcMint.pubkey,
+            receiver: receiverAccMeta.pubkey,
+            dstMint: dstMint.pubkey,
+            integratorDstAta: integratorDstAta.pubkey,
+            programId: ix.programId,
+            protocolDstAta: protocolDstAta.pubkey
+        })
+    }
+
+    static fromResolverCancelInstruction(
+        ix: TransactionInstruction
+    ): FusionOrder {
+        const _ix = new BorshCoder(IDL).instruction.decode(ix.data)
+
+        if (!_ix || _ix.name !== 'cancelByResolver') {
+            throw new Error('invalid instruction')
+        }
+
+        assert('reducedOrder' in _ix.data)
+
+        const reducedConfig = _ix.data.reducedOrder as ReducedOrderConfig
+
+        const srcMint = ix.accounts[4]
+        const dstMint = ix.accounts[5]
+        const receiverAccMeta = ix.accounts[3]
+        const protocolDstAta = ix.accounts[11]
+        const integratorDstAta = ix.accounts[12]
+
+        assert(receiverAccMeta)
+        assert(srcMint)
+        assert(dstMint)
+        assert(protocolDstAta)
+        assert(integratorDstAta)
+
+        return FusionOrder.fromReducedOrder(reducedConfig, {
+            srcMint: srcMint.pubkey,
+            receiver: receiverAccMeta.pubkey,
+            dstMint: dstMint.pubkey,
+            integratorDstAta: integratorDstAta.pubkey,
+            programId: ix.programId,
+            protocolDstAta: protocolDstAta.pubkey
+        })
+    }
+
+    static fromReducedOrder(
+        reducedConfig: ReducedOrderConfig,
+        accounts: {
+            srcMint: Address
+            dstMint: Address
+            receiver: Address
+            protocolDstAta: Address
+            integratorDstAta: Address
+            programId: Address
+        }
+    ): FusionOrder {
+        const {
+            srcMint,
+            dstMint,
+            receiver,
+            protocolDstAta,
+            integratorDstAta,
+            programId
+        } = accounts
         const {dutchAuctionData: auction, fee} = reducedConfig
 
         const orderExpirationDelay =
             reducedConfig.expirationTime - auction.duration - auction.startTime
 
         const fees = new FeeConfig(
-            protocolDstAta.pubkey.equal(ix.programId)
-                ? null
-                : protocolDstAta.pubkey,
-            integratorDstAta.pubkey.equal(ix.programId)
-                ? null
-                : integratorDstAta.pubkey,
+            protocolDstAta.equal(programId) ? null : protocolDstAta,
+            integratorDstAta.equal(programId) ? null : integratorDstAta,
             Bps.fromFraction(fee.protocolFee, FeeConfig.BASE_1E5),
             Bps.fromFraction(fee.integratorFee, FeeConfig.BASE_1E5),
             Bps.fromFraction(fee.surplusPercentage, FeeConfig.BASE_1E2)
@@ -279,15 +298,15 @@ export class FusionOrder {
 
         return new FusionOrder(
             {
-                srcMint: srcMint.pubkey,
-                dstMint: dstMint.pubkey,
+                srcMint: srcMint,
+                dstMint: dstMint,
                 id: reducedConfig.id,
                 srcAmount: BigInt(reducedConfig.srcAmount.toString()),
                 minDstAmount: BigInt(reducedConfig.minDstAmount.toString()),
                 estimatedDstAmount: BigInt(
                     reducedConfig.estimatedDstAmount.toString()
                 ),
-                receiver: receiverAccMeta.pubkey
+                receiver
             },
             new AuctionDetails({
                 startTime: auction.startTime,
