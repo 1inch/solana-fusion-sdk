@@ -199,9 +199,9 @@ export class FusionOrder {
             throw new Error('invalid instruction')
         }
 
-        assert('reducedOrder' in _ix.data)
+        assert('order' in _ix.data)
 
-        const reducedConfig = _ix.data.reducedOrder as ContractOrderConfig
+        const reducedConfig = _ix.data.order as ContractOrderConfig
 
         const srcMint = ix.accounts[4]
         const dstMint = ix.accounts[5]
@@ -234,9 +234,9 @@ export class FusionOrder {
             throw new Error('invalid instruction')
         }
 
-        assert('reducedOrder' in _ix.data)
+        assert('order' in _ix.data)
 
-        const reducedConfig = _ix.data.reducedOrder as ContractOrderConfig
+        const reducedConfig = _ix.data.order as ContractOrderConfig
 
         const srcMint = ix.accounts[4]
         const dstMint = ix.accounts[5]
