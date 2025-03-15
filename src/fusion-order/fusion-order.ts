@@ -168,7 +168,7 @@ export class FusionOrder {
 
         assert('order' in _ix.data)
 
-        const reducedConfig = _ix.data.order as ReducedOrderConfig
+        const reducedConfig = _ix.data.order as ContractOrderConfig
 
         const srcMint = ix.accounts[2]
         const dstMint = ix.accounts[7]
@@ -201,7 +201,7 @@ export class FusionOrder {
 
         assert('reducedOrder' in _ix.data)
 
-        const reducedConfig = _ix.data.reducedOrder as ReducedOrderConfig
+        const reducedConfig = _ix.data.reducedOrder as ContractOrderConfig
 
         const srcMint = ix.accounts[4]
         const dstMint = ix.accounts[5]
@@ -236,7 +236,7 @@ export class FusionOrder {
 
         assert('reducedOrder' in _ix.data)
 
-        const reducedConfig = _ix.data.reducedOrder as ReducedOrderConfig
+        const reducedConfig = _ix.data.reducedOrder as ContractOrderConfig
 
         const srcMint = ix.accounts[4]
         const dstMint = ix.accounts[5]
@@ -261,7 +261,7 @@ export class FusionOrder {
     }
 
     static fromReducedOrder(
-        reducedConfig: ReducedOrderConfig,
+        reducedConfig: ContractOrderConfig,
         accounts: {
             srcMint: Address
             dstMint: Address
@@ -372,25 +372,7 @@ export class FusionOrder {
         )
     }
 
-    public build(): OrderConfig {
-        const {fees} = this.orderConfig
-
-        const reduced = this.asReduced()
-
-        return {
-            ...reduced,
-            receiver: this.orderConfig.receiver.toBuffer(),
-            fee: {
-                ...reduced.fee,
-                protocolDstAta: fees.protocolDstAta?.toBuffer() || null,
-                integratorDstAta: fees.integratorDstAta?.toBuffer() || null
-            },
-            srcMint: this.orderConfig.srcMint.toBuffer(),
-            dstMint: this.orderConfig.dstMint.toBuffer()
-        }
-    }
-
-    public asReduced(): ReducedOrderConfig {
+    public build(): ContractOrderConfig {
         const {
             fees,
             dutchAuctionData: auction,
@@ -435,23 +417,23 @@ export class FusionOrder {
     public toJSON(): FusionOrderJSON {
         const order = this.build()
 
-        const {protocolDstAta, integratorDstAta} = order.fee
+        const {protocolDstAta, integratorDstAta} = this.orderConfig.fees
 
         return {
             ...order,
             srcAmount: order.srcAmount.toString(),
             estimatedDstAmount: order.estimatedDstAmount.toString(),
             minDstAmount: order.minDstAmount.toString(),
-            receiver: Address.fromBuffer(order.receiver).toString(),
-            srcMint: Address.fromBuffer(order.srcMint).toString(),
-            dstMint: Address.fromBuffer(order.dstMint).toString(),
+            receiver: this.orderConfig.receiver.toString(),
+            srcMint: this.orderConfig.srcMint.toString(),
+            dstMint: this.orderConfig.dstMint.toString(),
             fee: {
                 ...order.fee,
                 protocolDstAta: protocolDstAta
-                    ? Address.fromBuffer(protocolDstAta).toString()
+                    ? protocolDstAta.toString()
                     : null,
                 integratorDstAta: integratorDstAta
-                    ? Address.fromBuffer(integratorDstAta).toString()
+                    ? integratorDstAta.toString()
                     : null,
                 maxCancellationPremium:
                     order.fee.maxCancellationPremium.toString()
@@ -463,9 +445,25 @@ export class FusionOrder {
      * Returns orderHash
      */
     public getOrderHash(): Buffer {
-        const encoded = borsh.serialize(OrderConfigSchema, this.build())
-
-        return crypto.createHash('sha256').update(encoded).digest()
+        return crypto
+            .createHash('sha256')
+            .update(borsh.serialize(OrderConfigSchema, this.build()))
+            .update(
+                borsh.serialize(
+                    OptionalAddressSchema,
+                    this.orderConfig.fees.protocolDstAta?.toBuffer()
+                )
+            )
+            .update(
+                borsh.serialize(
+                    OptionalAddressSchema,
+                    this.orderConfig.fees.integratorDstAta?.toBuffer()
+                )
+            )
+            .update(borsh.serialize(AddressSchema, this.srcMint.toBuffer()))
+            .update(borsh.serialize(AddressSchema, this.dstMint.toBuffer()))
+            .update(borsh.serialize(AddressSchema, this.receiver.toBuffer()))
+            .digest()
     }
 
     /**
@@ -587,7 +585,7 @@ export class FusionOrder {
     }
 }
 
-type ReducedOrderConfig = {
+type ContractOrderConfig = {
     id: number
     srcAmount: BN
     minDstAmount: BN
@@ -609,16 +607,6 @@ type ReducedOrderConfig = {
             rateBump: number
             timeDelta: number
         }[]
-    }
-}
-
-type OrderConfig = ReducedOrderConfig & {
-    receiver: Buffer
-    srcMint: Buffer
-    dstMint: Buffer
-    fee: ReducedOrderConfig['fee'] & {
-        protocolDstAta: Buffer | null
-        integratorDstAta: Buffer | null
     }
 }
 
@@ -660,11 +648,8 @@ const OrderConfigSchema = {
         estimatedDstAmount: 'u64',
         expirationTime: 'u32',
         nativeDstAsset: 'bool',
-        receiver: {array: {type: 'u8', len: 32}},
         fee: {
             struct: {
-                protocolDstAta: {option: {array: {type: 'u8', len: 32}}},
-                integratorDstAta: {option: {array: {type: 'u8', len: 32}}},
                 protocolFee: 'u16',
                 integratorFee: 'u16',
                 surplusPercentage: 'u8',
@@ -688,8 +673,9 @@ const OrderConfigSchema = {
                 }
             }
         },
-        cancellationAuctionDuration: 'u32',
-        srcMint: {array: {type: 'u8', len: 32}},
-        dstMint: {array: {type: 'u8', len: 32}}
+        cancellationAuctionDuration: 'u32'
     }
 }
+
+const AddressSchema = {array: {type: 'u8', len: 32}}
+const OptionalAddressSchema = {option: {array: {type: 'u8', len: 32}}}

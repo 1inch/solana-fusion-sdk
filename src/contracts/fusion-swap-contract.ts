@@ -9,7 +9,7 @@ import {IDL} from '../idl/fusion-swap'
 import {getPda} from '../utils/addresses/pda'
 
 export class FusionSwapContract {
-    static ADDRESS = new Address('9CnwB8RDNtRzRcxvkNqwgatRDENBCh2f56HgJLPStn8S')
+    static ADDRESS = new Address('9HrF5xdbeYPjftX3y3r2NtEzVCwHZr7DAAFzcmrRCFuF')
 
     private readonly coder = new BorshCoder(IDL)
 
@@ -117,7 +117,7 @@ export class FusionSwapContract {
                 }
             ],
             this.coder.instruction.encode('create', {
-                order: order.asReduced()
+                order: order.build()
             })
         )
     }
@@ -294,7 +294,7 @@ export class FusionSwapContract {
                       }
             ],
             this.coder.instruction.encode('fill', {
-                reducedOrder: order.asReduced(),
+                order: order.build(),
                 amount: new BN(amount.toString())
             })
         )
@@ -381,12 +381,17 @@ export class FusionSwapContract {
             resolver: Address
             srcTokenProgram: Address
             whitelist?: Address
-        }
+        },
+        /**
+         * If resolver wants to limit reward, he can pass here max reward in lamports
+         */
+        rewardLimit = order.resolverCancellationConfig?.maxCancellationPremium
     ): TransactionInstruction {
         assert(
             order.resolverCancellationConfig,
             'order can not be cancelled by resolver'
         )
+        assert(rewardLimit != undefined)
 
         const textEncoder = new TextEncoder()
         const whitelist = accounts.whitelist || WhitelistContract.ADDRESS
@@ -505,7 +510,8 @@ export class FusionSwapContract {
                       }
             ],
             this.coder.instruction.encode('cancelByResolver', {
-                reducedOrder: order.asReduced()
+                order: order.build(),
+                rewardLimit: new BN(rewardLimit.toString())
             })
         )
     }
