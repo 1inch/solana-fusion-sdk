@@ -14,7 +14,10 @@ export type ActiveOrder = {
     remainingMakerAmount: string
 }
 
-export type GetAllowMethodsRpcEvent = RpcEvent<RpcMethod.GetAllowedMethods, RpcMethod[]>
+export type GetAllowMethodsRpcEvent = RpcEvent<
+    RpcMethod.GetAllowedMethods,
+    RpcMethod[]
+>
 
 export enum RpcMethod {
     GetAllowedMethods = 'getAllowedMethods',
@@ -52,4 +55,7 @@ export type OrderFillEvent = Event<EventType.Fill, OrderEventPayload>
 
 export type OrderCancelEvent = Event<EventType.Cancel, OrderEventPayload>
 
-export type OrderEventType = OrderCreateEvent | OrderFillEvent | OrderCancelEvent
+export type OrderEventType =
+    | OrderCreateEvent
+    | OrderFillEvent
+    | OrderCancelEvent

@@ -96,7 +96,7 @@ describe('FusionSwap', () => {
     })
 
     it('should fill order with no fee', async () => {
-        const order = new FusionOrder(
+        const order = FusionOrder.new(
             {
                 srcMint: Address.fromPublicKey(srcToken.publicKey),
                 dstMint: Address.fromPublicKey(dstToken.publicKey),
@@ -205,7 +205,7 @@ describe('FusionSwap', () => {
     })
 
     it('should cancel order by maker', async () => {
-        const order = new FusionOrder(
+        const order = FusionOrder.new(
             {
                 srcMint: Address.fromPublicKey(srcToken.publicKey),
                 dstMint: Address.fromPublicKey(dstToken.publicKey),
@@ -291,7 +291,7 @@ describe('FusionSwap', () => {
     })
 
     it('should cancel order by resolver', async () => {
-        const order = new FusionOrder(
+        const order = FusionOrder.new(
             {
                 srcMint: Address.fromPublicKey(srcToken.publicKey),
                 dstMint: Address.fromPublicKey(dstToken.publicKey),

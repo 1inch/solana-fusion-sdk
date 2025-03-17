@@ -9,7 +9,7 @@ import {IDL} from '../idl/fusion-swap'
 import {getPda} from '../utils/addresses/pda'
 
 export class FusionSwapContract {
-    static ADDRESS = new Address('9HrF5xdbeYPjftX3y3r2NtEzVCwHZr7DAAFzcmrRCFuF')
+    static ADDRESS = new Address('hfx5P17FFE6Twr41CujppXU67K8VgA3NUtEn8UHxb6P')
 
     private readonly coder = new BorshCoder(IDL)
 
