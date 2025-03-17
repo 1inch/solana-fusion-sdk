@@ -29,10 +29,13 @@ importers:
       type-fest:
         specifier: 4.35.0
         version: 4.35.0
+      ws:
+        specifier: ^8.18.1
+        version: 8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     devDependencies:
       '@1inch/eslint-config':
         specifier: latest
-        version: 3.0.7(5da74aab0cd20b4f774934cced23856d)
+        version: 3.0.7(o7wbgiej5ela5f7rqyj2mstc4m)
       '@1inch/tsconfig':
         specifier: ^1.0.0
         version: 1.0.8
@@ -2877,7 +2880,7 @@ snapshots:
     optionalDependencies:
       assert: 2.1.0
 
-  '@1inch/eslint-config@3.0.7(5da74aab0cd20b4f774934cced23856d)':
+  '@1inch/eslint-config@3.0.7(o7wbgiej5ela5f7rqyj2mstc4m)':
     dependencies:
       '@eslint/compat': 1.2.7(eslint@9.20.1)
       '@eslint/eslintrc': 3.3.0
