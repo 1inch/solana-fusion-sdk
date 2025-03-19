@@ -1,4 +1,5 @@
 import {Jsonify} from 'type-fest'
+import WebSocket from 'ws'
 import {FusionOrder} from '../fusion-order'
 
 export type RpcEvent<T extends RpcMethod, K> = {
