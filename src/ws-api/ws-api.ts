@@ -4,9 +4,10 @@ import {castUrl} from './url'
 import {
     AnyFunction,
     AnyFunctionWithThis,
+    NetworkEnum,
     OnMessageCb,
     WebSocketEvent,
-    WsApiConfigWithNetwork
+    WsApiConfig
 } from './types'
 import {WsProviderConnector} from './websocket-provider.connector'
 import {WebsocketClient} from './websocket-client.connector'
@@ -20,12 +21,10 @@ export class WebSocketApi {
 
     public readonly provider: WsProviderConnector
 
-    constructor(
-        configOrProvider: WsApiConfigWithNetwork | WsProviderConnector
-    ) {
-        if (instanceOfWsApiConfigWithNetwork(configOrProvider)) {
+    constructor(configOrProvider: WsApiConfig | WsProviderConnector) {
+        if (instanceOfWsApiConfig(configOrProvider)) {
             const url = castUrl(configOrProvider.url)
-            const urlWithNetwork = `${url}/${WebSocketApi.Version}/${configOrProvider.network}`
+            const urlWithNetwork = `${url}/${WebSocketApi.Version}/${NetworkEnum.SOLANA}`
             const configWithUrl = {...configOrProvider, url: urlWithNetwork}
             const provider = new WebsocketClient(configWithUrl)
 
@@ -42,7 +41,7 @@ export class WebSocketApi {
     }
 
     static new(
-        configOrProvider: WsApiConfigWithNetwork | WsProviderConnector
+        configOrProvider: WsApiConfig | WsProviderConnector
     ): WebSocketApi {
         return new WebSocketApi(configOrProvider)
     }
@@ -84,8 +83,8 @@ export class WebSocketApi {
     }
 }
 
-function instanceOfWsApiConfigWithNetwork(
-    val: WsApiConfigWithNetwork | WsProviderConnector
-): val is WsApiConfigWithNetwork {
-    return 'url' in val && 'network' in val
+function instanceOfWsApiConfig(
+    val: WsApiConfig | WsProviderConnector
+): val is WsApiConfig {
+    return 'url' in val
 }

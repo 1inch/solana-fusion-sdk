@@ -4,7 +4,6 @@ import {
     EventType,
     GetActiveOrdersRpcEvent,
     GetAllowMethodsRpcEvent,
-    NetworkEnum,
     OrderCancelledEvent,
     OrderCreatedEvent,
     OrderEventType,
@@ -26,7 +25,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -44,7 +42,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -61,7 +58,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -76,8 +72,7 @@ describe(__filename, () => {
         // TODO repair waiting a lot of time ....
         xit('should be possible to subscribe to error', (done) => {
             const wsSdk = new WebSocketApi({
-                url: 'ws://localhost:2345',
-                network: NetworkEnum.ETHEREUM
+                url: 'ws://localhost:2345'
             })
 
             wsSdk.on(WebSocketEvent.Error, (error) => {
@@ -92,7 +87,7 @@ describe(__filename, () => {
             const port = 8080
 
             const url = `ws://localhost:${port}/ws`
-            const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
+            const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
 
             wss.on('connection', (ws: WebSocket) => {
                 for (const m of [message]) {
@@ -102,7 +97,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 lazyInit: true,
                 authKey: ''
             })
@@ -125,7 +119,6 @@ describe(__filename, () => {
         it('should be safe to call methods on uninitialized ws', () => {
             const wsSdk = new WebSocketApi({
                 url: 'random',
-                network: NetworkEnum.ETHEREUM,
                 lazyInit: true
             })
 
@@ -137,7 +130,7 @@ describe(__filename, () => {
             const port = 8080
 
             const url = `ws://localhost:${port}/ws`
-            const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
+            const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
 
             wss.on('connection', (ws: WebSocket) => {
                 for (const m of [message]) {
@@ -147,7 +140,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 lazyInit: false
             })
 
@@ -167,7 +159,7 @@ describe(__filename, () => {
             const port = 8080
 
             const url = `ws://localhost:${port}/ws`
-            const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
+            const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
 
             wss.on('connection', (ws: WebSocket) => {
                 for (const m of [message]) {
@@ -200,7 +192,7 @@ describe(__filename, () => {
             const port = 8080
 
             const url = `ws://localhost:${port}/ws`
-            const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
+            const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
 
             wss.on('connection', (ws: WebSocket) => {
                 for (const m of [message]) {
@@ -237,7 +229,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -268,7 +259,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -303,7 +293,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -342,7 +331,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -381,7 +369,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -450,7 +437,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -521,7 +507,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -637,7 +622,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -753,7 +737,6 @@ describe(__filename, () => {
 
             const wsSdk = new WebSocketApi({
                 url,
-                network: NetworkEnum.ETHEREUM,
                 authKey: ''
             })
 
@@ -781,8 +764,8 @@ function createWebsocketRpcServerMock(
     wss: WebSocketServer
 } {
     const port = 8080
-    const returnUrl = `ws://localhost:${port}/ws`
-    const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
+    const returnUrl = `ws://localhost:${port}/websocket/v1.0/501`
+    const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
 
     wss.on('connection', (ws: WebSocket) => {
         ws.on('message', (data: unknown) => cb(ws, data))
@@ -797,8 +780,8 @@ function createWebsocketServerMock(messages: any[]): {
 } {
     const port = 8080
 
-    const returnUrl = `ws://localhost:${port}/ws`
-    const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
+    const returnUrl = `ws://localhost:${port}/websocket`
+    const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
 
     wss.on('connection', (ws: WebSocket) => {
         for (const message of messages) {

@@ -167,7 +167,3 @@ export enum NetworkEnum {
     LINEA = 59144,
     SOLANA = 501
 }
-
-export type WsApiConfigWithNetwork = WsApiConfig & {
-    network: NetworkEnum
-}
