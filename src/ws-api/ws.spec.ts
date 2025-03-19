@@ -15,7 +15,6 @@ import {
 } from './types'
 import {castUrl} from './url'
 import {WebsocketClient} from './websocket-client.connector'
-import {Address} from '../domains'
 
 jest.setTimeout(5 * 60 * 1000)
 
@@ -93,7 +92,7 @@ describe(__filename, () => {
             const port = 8080
 
             const url = `ws://localhost:${port}/ws`
-            const wss = new WebSocketServer({port, path: '/ws/v1.0/1'})
+            const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
 
             wss.on('connection', (ws: WebSocket) => {
                 for (const m of [message]) {
@@ -138,7 +137,7 @@ describe(__filename, () => {
             const port = 8080
 
             const url = `ws://localhost:${port}/ws`
-            const wss = new WebSocketServer({port, path: '/ws/v1.0/1'})
+            const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
 
             wss.on('connection', (ws: WebSocket) => {
                 for (const m of [message]) {
@@ -168,7 +167,7 @@ describe(__filename, () => {
             const port = 8080
 
             const url = `ws://localhost:${port}/ws`
-            const wss = new WebSocketServer({port, path: '/ws/v1.0/1'})
+            const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
 
             wss.on('connection', (ws: WebSocket) => {
                 for (const m of [message]) {
@@ -201,7 +200,7 @@ describe(__filename, () => {
             const port = 8080
 
             const url = `ws://localhost:${port}/ws`
-            const wss = new WebSocketServer({port, path: '/ws/v1.0/1'})
+            const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
 
             wss.on('connection', (ws: WebSocket) => {
                 for (const m of [message]) {
@@ -404,42 +403,44 @@ describe(__filename, () => {
             const message1: OrderCreatedEvent = {
                 event: EventType.Create,
                 result: {
-                    orderHash:
-                        '0xb9522c23c8667c5e76bf0b855ffabbaebca282f8e396d788c2df75e91a0391d2-5705f2156ef5b2db36c160b36f31ce4',
+                    transactionSignature:
+                        '552R8GxcRyabBGr2inXi8v8VeByRvNghW4obXvXmbTJoy6sLdSNEwFVGcYjiZNpBL1CzqigR1bi31yPXxhq7f3Np',
+                    slotNumber: 100500,
+                    blockTime: 100500,
+                    action: 'create',
+                    commitment: 'finalized',
+                    orderHash: 'Cd7Y1XCsqtd8JGcjecgHHatKtkqyEGkr1h4TCsur14Ki',
+                    maker: '49HbHjsigfRLhWriKTse77Bw7UPaMN29dGCxM2BfgfVz',
+                    resolver: '3k2mmTKz5oNDUv4n3TrxuvF5euYW2fZKHsk9frbQX8Ti',
                     order: {
-                        fees: '0',
-
-                        salt: '9445680545936410419330284706951757224702878670220689583677680607556412140293',
-                        maker: '0x6edc317f3208b10c46f4ff97faa04dd632487408',
-                        receiver: Address.fromUnknown(
-                            '0x0000000000000000000000000000000000000000'
-                        ),
-                        makerAsset:
-                            '0x6b175474e89094c44da98b954eedeac495271d0f',
-                        takerAsset:
-                            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-                        makerTraits:
-                            '62419173104490761595518734106557662061518414611782227068396304425790442831872',
-                        makingAmount: '30000000000000000000',
-                        takingAmount: '7516665910385115'
+                        fee: {
+                            protocolFee: 0,
+                            integratorFee: 0,
+                            protocolDstAta: null,
+                            integratorDstAta: null,
+                            surplusPercentage: 0,
+                            maxCancellationPremium: '1'
+                        },
+                        dstMint: 'So11111111111111111111111111111111111111112',
+                        srcMint: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+                        receiver:
+                            '49HbHjsigfRLhWriKTse77Bw7UPaMN29dGCxM2BfgfVz',
+                        srcAmount: '1200000',
+                        minDstAmount: '6729670',
+                        expirationTime: 1742228896,
+                        nativeDstAsset: true,
+                        nativeSrcAsset: false,
+                        dutchAuctionData: {
+                            duration: 24,
+                            startTime: 1742228860,
+                            initialRateBump: 7039,
+                            pointsAndTimeDeltas: []
+                        },
+                        estimatedDstAmount: '6729670',
+                        cancellationAuctionDuration: 1
                     },
-                    signature:
-                        '0xb51731d6e62754ae75d11d13983c19b25fcc1a43fc327710a26ae291fde3d33f52dee7a4c0154256f6bb272260170128242034a89f44e7e887d1bb54a746a5941b',
-                    extension:
-                        '0x000000cb0000005e0000005e0000005e0000005e0000002f0000000000000000fb2809a5314473e1165f6b58018e20ed8f07b84000000000000000662fba0700025829a7fd01ec57001827bba60018fb2809a5314473e1165f6b58018e20ed8f07b84000000000000000662fba0700025829a7fd01ec57001827bba60018fb2809a5314473e1165f6b58018e20ed8f07b840662fb9efb09498030ae3416b66dc00007bf29735c20c566e5a0c0000950fa635aec75b30781a0000d18bd45f0b94f54a968f000076d49414ad2b8371a4220000a59ca88d5813e693528f000038700d5181a674fdb9a2000038',
-                    srcChainId: NetworkEnum.ETHEREUM,
-                    dstChainId: NetworkEnum.POLYGON,
-                    isMakerContract: false,
-                    merkleLeaves: [
-                        '0x71ad135b040d726eb59a9f718db4d9c9ab93eee0aa072a92569f24ac2f4e314a',
-                        '0xfe9789f805bd764824c94a1d764776c3177f92c9ee3d3a1c074c314d2af30bd7',
-                        '0x00b2a24fd759c4093935c5268b5cc187b9b15bf287230439453e65e67191902e'
-                    ],
-                    secretHashes: [
-                        '0x2048b38093dc53876b2bbd230ee8999791153db01de425112f449d018094e116',
-                        '0x7972c1498893bb9b88baddc9decb78d8defdcc7a182a72edd8724498c75f088d',
-                        '0x6d5b8f0b1f8a28564ff65e5f9c4d8a8a6babfb318bca6ecc9d872a3abe8a4ea0'
-                    ]
+                    filledAuctionTakerAmount: '12470402',
+                    filledMakerAmount: '100000000'
                 }
             }
 
@@ -923,7 +924,7 @@ function createWebsocketRpcServerMock(
 } {
     const port = 8080
     const returnUrl = `ws://localhost:${port}/ws`
-    const wss = new WebSocketServer({port, path: '/ws/v1.0/1'})
+    const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
 
     wss.on('connection', (ws: WebSocket) => {
         ws.on('message', (data: unknown) => cb(ws, data))
@@ -939,7 +940,7 @@ function createWebsocketServerMock(messages: any[]): {
     const port = 8080
 
     const returnUrl = `ws://localhost:${port}/ws`
-    const wss = new WebSocketServer({port, path: '/ws/v1.0/1'})
+    const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
 
     wss.on('connection', (ws: WebSocket) => {
         for (const message of messages) {

@@ -65,7 +65,7 @@ export type OrderEventPayload = {
     orderHash: string
     maker: string
     resolver: string | undefined
-    order: FusionOrder | undefined
+    order: Jsonify<FusionOrder> | undefined
     filledAuctionTakerAmount: string | undefined
     filledMakerAmount: string | undefined
 }
