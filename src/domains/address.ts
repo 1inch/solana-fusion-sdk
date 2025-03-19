@@ -27,6 +27,10 @@ export class Address implements AddressLike {
         'So11111111111111111111111111111111111111112'
     )
 
+    public static readonly NATIVE = new Address(
+        'SoNative11111111111111111111111111111111111'
+    )
+
     private readonly buf: Uint8Array
 
     constructor(value: string) {
