@@ -21,9 +21,12 @@ export class WebSocketApi {
 
     public readonly provider: WsProviderConnector
 
-    constructor(configOrProvider: WsApiConfig | WsProviderConnector) {
-        if (instanceOfWsApiConfig(configOrProvider)) {
-            const url = castUrl(configOrProvider.url)
+    private constructor(
+        configOrProvider: WsApiConfig | WsProviderConnector,
+        isConfig: boolean
+    ) {
+        if (isConfig) {
+            const url = castUrl((configOrProvider as WsApiConfig).url)
             const urlWithNetwork = `${url}/${WebSocketApi.Version}/${NetworkEnum.SOLANA}`
             const configWithUrl = {...configOrProvider, url: urlWithNetwork}
             const provider = new WebsocketClient(configWithUrl)
@@ -35,15 +38,19 @@ export class WebSocketApi {
             return
         }
 
-        this.provider = configOrProvider
-        this.rpc = new RpcWebsocketApi(configOrProvider)
-        this.order = new ActiveOrdersWebSocketApi(configOrProvider)
+        this.provider = configOrProvider as WsProviderConnector
+        this.rpc = new RpcWebsocketApi(configOrProvider as WsProviderConnector)
+        this.order = new ActiveOrdersWebSocketApi(
+            configOrProvider as WsProviderConnector
+        )
     }
 
-    static new(
-        configOrProvider: WsApiConfig | WsProviderConnector
-    ): WebSocketApi {
-        return new WebSocketApi(configOrProvider)
+    static createFromConfig(config: WsApiConfig): WebSocketApi {
+        return new WebSocketApi(config, true)
+    }
+
+    static createFromProvider(provider: WsProviderConnector): WebSocketApi {
+        return new WebSocketApi(provider, false)
     }
 
     init(): void {
@@ -81,10 +88,4 @@ export class WebSocketApi {
     onError(cb: AnyFunction): void {
         this.provider.onError(cb)
     }
-}
-
-function instanceOfWsApiConfig(
-    val: WsApiConfig | WsProviderConnector
-): val is WsApiConfig {
-    return 'url' in val
 }

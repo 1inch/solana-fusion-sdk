@@ -8,7 +8,7 @@ import {
 } from './types'
 import {WsProviderConnector} from './websocket-provider.connector'
 
-export class WebsocketClient implements WsProviderConnector {
+export class WebsocketClient extends WsProviderConnector {
     public readonly ws!: WebSocket
 
     private readonly url: string
@@ -18,6 +18,7 @@ export class WebsocketClient implements WsProviderConnector {
     private readonly authKey?: string
 
     constructor(config: WsApiConfig) {
+        super()
         this.url = config.url
         this.authKey = config.authKey
 

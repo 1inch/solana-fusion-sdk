@@ -5,21 +5,26 @@ import {
     OnMessageInputVoidCb
 } from './types'
 
-export interface WsProviderConnector {
-    init(): void
+export abstract class WsProviderConnector {
+    abstract init(): void
 
-    on(event: string, cb: AnyFunctionWithThis): void
-    off(event: string, cb: AnyFunctionWithThis): void
+    abstract on(event: string, cb: AnyFunctionWithThis): void
 
-    onOpen(cb: AnyFunctionWithThis): void
+    abstract off(event: string, cb: AnyFunctionWithThis): void
 
-    send<T>(message: T): void
-    close(): void
+    abstract onOpen(cb: AnyFunctionWithThis): void
 
-    ping(): void
-    onPong(cb: OnMessageInputVoidCb): void
+    abstract send<T>(message: T): void
 
-    onMessage(cb: OnMessageCb): void
-    onClose(cb: AnyFunction): void
-    onError(cb: AnyFunction): void
+    abstract close(): void
+
+    abstract ping(): void
+
+    abstract onPong(cb: OnMessageInputVoidCb): void
+
+    abstract onMessage(cb: OnMessageCb): void
+
+    abstract onClose(cb: AnyFunction): void
+
+    abstract onError(cb: AnyFunction): void
 }
