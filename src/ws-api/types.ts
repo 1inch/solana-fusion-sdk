@@ -121,8 +121,6 @@ export type OnGetAllowedMethodsCb = (
     data: GetAllowMethodsRpcEvent['result']
 ) => any
 
-export type PingRpcEvent = RpcEvent<RpcMethod.Ping, string>
-
 export type OnPongCb = () => any
 
 export type PaginationParams = {

@@ -85,8 +85,8 @@ describe(__filename, () => {
             const message = {id: 1}
             const port = 8080
 
-            const url = `ws://localhost:${port}/websocket`
-            const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
+            const url = `ws://localhost:${port}/ws`
+            const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
 
             wss.on('connection', (ws: WebSocket) => {
                 for (const m of [message]) {
@@ -128,8 +128,8 @@ describe(__filename, () => {
             const message = {id: 1}
             const port = 8080
 
-            const url = `ws://localhost:${port}/websocket`
-            const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
+            const url = `ws://localhost:${port}/ws`
+            const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
 
             wss.on('connection', (ws: WebSocket) => {
                 for (const m of [message]) {
@@ -157,8 +157,8 @@ describe(__filename, () => {
             const message = {id: 1}
             const port = 8080
 
-            const url = `ws://localhost:${port}/websocket`
-            const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
+            const url = `ws://localhost:${port}/ws`
+            const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
 
             wss.on('connection', (ws: WebSocket) => {
                 for (const m of [message]) {
@@ -723,8 +723,8 @@ function createWebsocketRpcServerMock(
     wss: WebSocketServer
 } {
     const port = 8080
-    const returnUrl = `ws://localhost:${port}/websocket`
-    const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
+    const returnUrl = `ws://localhost:${port}/ws`
+    const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
 
     wss.on('connection', (ws: WebSocket) => {
         ws.on('message', (data: unknown) => cb(ws, data))
@@ -742,8 +742,8 @@ function createWebsocketServerMock(messages: any[]): {
 } {
     const port = 8080
 
-    const returnUrl = `ws://localhost:${port}/websocket`
-    const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
+    const returnUrl = `ws://localhost:${port}/ws`
+    const wss = new WebSocketServer({port, path: '/ws/v1.0/501'})
 
     wss.on('connection', (ws: WebSocket) => {
         for (const message of messages) {

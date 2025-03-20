@@ -5,11 +5,10 @@
 ## Real world example
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const wsSdk = new WebSocketApi({
     url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM,
     authKey: 'your-auth-key'
 })
 
@@ -23,11 +22,10 @@ wsSdk.order.onOrder((data) => {
 **With constructor:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
     url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM,
     authKey: 'your-auth-key'
 })
 ```
@@ -37,13 +35,13 @@ const ws = new WebSocketApi({
 User can provide custom provider for websocket (be default we are using [ws library](https://www.npmjs.com/package/ws))
 
 ```typescript
-import {WsProviderConnector, WebSocketApi} from '@1inch/fusion-sdk'
+import {WsProviderConnector, WebSocketApi} from '@1inch/solana-fusion-sdk'
 
-class MyFancyProvider implements WsProviderConnector {
+class MyFancyProvider extends WsProviderConnector {
     // ... user implementation
 }
 
-const url = 'wss://api.1inch.dev/fusion/ws/v2.0/1'
+const url = 'wss://api.1inch.dev/fusion/ws/v1.0/501'
 const provider = new MyFancyProvider({url})
 
 const wsSdk = new WebSocketApi(provider)
@@ -52,11 +50,10 @@ const wsSdk = new WebSocketApi(provider)
 **With new static method:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/cross-chain-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = WebSocketApi.new({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 ```
 
@@ -65,11 +62,10 @@ const ws = WebSocketApi.new({
 By default, when user creates an instance of WebSocketApi, it automatically opens websocket connection which might be a problem for some use cases
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/cross-chain-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
     url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM,
     lazyInit: true
 })
 
@@ -92,11 +88,10 @@ ws.init()
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.on(WebSocketEvent.Error, console.error)
@@ -122,11 +117,10 @@ ws.on(WebSocketEvent.Message, function message(data) {
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.on(WebSocketEvent.Error, console.error)
@@ -155,11 +149,10 @@ ws.off(WebSocketEvent.Message, message)
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.onOpen(() => {
@@ -178,11 +171,10 @@ ws.onOpen(() => {
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.send('my message')
@@ -195,11 +187,10 @@ ws.send('my message')
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.close()
@@ -216,11 +207,10 @@ ws.close()
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.onMessage((data) => {
@@ -235,11 +225,10 @@ ws.onMessage((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.onClose(() => {
@@ -258,11 +247,10 @@ ws.onClose(() => {
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.onError((error) => {
@@ -283,18 +271,18 @@ ws.onError((error) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi, EventType} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.order.onOrder((data) => {
-    if (data.event === 'order_created') {
+    if (data.event === EventType.Create) {
         // do something
     }
-    if (data.event === 'order_invalid') {
+    
+    if (data.event === EventType.Fill) {
         // do something
     }
 })
@@ -311,60 +299,13 @@ ws.order.onOrder((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.order.onOrderCreated((data) => {
-    // do something
-})
-```
-
-### onOrderInvalid
-
-**Description:** subscribe to order_invalid events
-
-**Arguments:**
-
--   [0] cb: (data: OrderInvalidEvent) => void
-
-**Example:**
-
-```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
-})
-
-ws.order.onOrderInvalid((data) => {
-    // do something
-})
-```
-
-### onOrderBalanceOrAllowanceChange
-
-**Description:** subscribe to order_balance_or_allowance_change events
-
-**Arguments:**
-
--   [0] cb: (data: OrderBalanceOrAllowanceChangeEvent) => void
-
-**Example:**
-
-```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
-})
-
-ws.order.onOrderBalanceOrAllowanceChange((data) => {
     // do something
 })
 ```
@@ -380,37 +321,13 @@ ws.order.onOrderBalanceOrAllowanceChange((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.order.onOrderFilled((data) => {
-    // do something
-})
-```
-
-### onOrderFilledPartially
-
-**Description:** subscribe to order_filled_partially events
-
-**Arguments:**
-
--   [0] cb: (data: OrderFilledPartiallyEvent) => void
-
-**Example:**
-
-```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
-})
-
-ws.order.onOrderFilledPartially((data) => {
     // do something
 })
 ```
@@ -426,11 +343,10 @@ ws.order.onOrderFilledPartially((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.order.onOrderCancelled((data) => {
@@ -451,11 +367,10 @@ ws.order.onOrderCancelled((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.rpc.onPong((data) => {
@@ -470,11 +385,10 @@ ws.rpc.onPong((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.rpc.ping()
@@ -487,11 +401,10 @@ ws.rpc.ping()
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.rpc.getAllowedMethods()
@@ -508,11 +421,10 @@ ws.rpc.getAllowedMethods()
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.rpc.onGetAllowedMethods((data) => {
@@ -527,11 +439,10 @@ ws.rpc.onGetAllowedMethods((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.rpc.getActiveOrders()
@@ -548,11 +459,10 @@ ws.rpc.getActiveOrders()
 **Example:**
 
 ```typescript
-import {WebSocketApi, NetworkEnum} from '@1inch/fusion-sdk'
+import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
 const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws',
-    network: NetworkEnum.ETHEREUM
+    url: 'wss://api.1inch.dev/fusion/ws'
 })
 
 ws.rpc.onGetActiveOrders((data) => {
@@ -567,107 +477,41 @@ ws.rpc.onGetActiveOrders((data) => {
 ```typescript
 import {OrderType} from './types'
 
-type Event<K extends string, T> = {event: K; data: T}
+export type Event<K extends string, T> = {
+    event: K
+    result: T
+}
 
 export type OrderEventType =
     | OrderCreatedEvent
-    | OrderInvalidEvent
-    | OrderBalanceChangeEvent
-    | OrderAllowanceChangeEvent
     | OrderFilledEvent
-    | OrderFilledPartiallyEvent
     | OrderCancelledEvent
-    | OrderSecretSharedEvent
 
 export enum EventType {
-    OrderCreated = 'order_created',
-    OrderInvalid = 'order_invalid',
-    OrderBalanceChange = 'order_balance_change',
-    OrderAllowanceChange = 'order_allowance_change',
-    OrderFilled = 'order_filled',
-    OrderFilledPartially = 'order_filled_partially',
-    OrderCancelled = 'order_cancelled',
-    OrderSecretShared = 'secret_shared'
+    Create = 'create',
+    Fill = 'fill',
+    Cancel = 'cancel'
 }
 
-type OrderCreatedEvent = Event<
-    'order_created',
-    {
-        orderHash: string
-        signature: string
-        order: LimitOrderV3Struct
-        deadline: string
-        auctionStartDate: string
-        auctionEndDate: string
-        remainingMakerAmount: string
-    }
->
+export type OrderEventPayload = {
+    transactionSignature: string
+    slotNumber: number
+    blockTime: number
+    action: string
+    commitment: string
+    orderHash: string
+    maker: string
+    resolver: string | undefined
+    order: Jsonify<FusionOrder> | undefined
+    filledAuctionTakerAmount: string | undefined
+    filledMakerAmount: string | undefined
+}
 
-export type OrderCreatedEvent = Event<
-    EventType.OrderCreated,
-    {
-        srcChainId: SupportedChain
-        dstChainId: SupportedChain
-        orderHash: string
-        order: LimitOrderV4Struct
-        extension: string
-        signature: string
-        isMakerContract: boolean
-        quoteId: string
-        merkleLeaves: string[]
-        secretHashes: string[]
-    }
->
+export type OrderCreatedEvent = Event<EventType.Create, OrderEventPayload>
 
-export type OrderBalanceChangeEvent = Event<
-    EventType.OrderBalanceChange,
-    {
-        orderHash: string
-        remainingMakerAmount: string
-        balance: string
-    }
->
+export type OrderFilledEvent = Event<EventType.Fill, OrderEventPayload>
 
-export type OrderAllowanceChangeEvent = Event<
-    EventType.OrderAllowanceChange,
-    {
-        orderHash: string
-        remainingMakerAmount: string
-        allowance: string
-    }
->
-
-type OrderInvalidEvent = Event<
-    EventType.OrderInvalid,
-    {
-        orderHash: string
-    }
->
-
-export type OrderCancelledEvent = Event<
-    EventType.OrderCancelled,
-    {
-        orderHash: string
-        remainingMakerAmount: string
-    }
->
-
-type OrderFilledEvent = Event<EventType.OrderFilled, {orderHash: string}>
-
-type OrderFilledPartiallyEvent = Event<
-    EventType.OrderFilledPartially,
-    {orderHash: string; remainingMakerAmount: string}
->
-
-export type OrderSecretSharedEvent = Event<
-    EventType.OrderSecretShared,
-    {
-        idx: number
-        secret: string
-        srcImmutables: Jsonify<Immutables>
-        dstImmutables: Jsonify<Immutables>
-    }
->
+export type OrderCancelledEvent = Event<EventType.Cancel, OrderEventPayload>
 ```
 
 ### RpcMethod
@@ -676,7 +520,6 @@ export type OrderSecretSharedEvent = Event<
 export enum RpcMethod {
     GetAllowedMethods = 'getAllowedMethods',
     Ping = 'ping',
-    GetActiveOrders = 'getActiveOrders',
-    GetSecrets = 'getSecrets'
+    GetActiveOrders = 'getActiveOrders'
 }
 ```
