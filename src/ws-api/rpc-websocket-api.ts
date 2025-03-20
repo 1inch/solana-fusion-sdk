@@ -23,7 +23,7 @@ export class RpcWebsocketApi {
     }
 
     ping(): void {
-        this.provider.send({method: RpcMethod.Ping})
+        this.provider.ping()
     }
 
     getActiveOrders({limit, page}: PaginationParams = {}): void {

@@ -8,7 +8,6 @@ import {
     OrderCreatedEvent,
     OrderEventType,
     OrderFilledEvent,
-    PingRpcEvent,
     RpcMethod,
     WebSocketEvent
 } from './types'
@@ -209,17 +208,7 @@ describe(__filename, () => {
 
     describe('rpc', () => {
         it('can ping pong ', (done) => {
-            const response: PingRpcEvent = {
-                method: RpcMethod.Ping,
-                result: 'pong'
-            }
-            const {url, wss} = createWebsocketRpcServerMock((ws, data) => {
-                const parsedData = JSON.parse(data)
-
-                if (parsedData.method === RpcMethod.Ping) {
-                    ws.send(JSON.stringify(response))
-                }
-            })
+            const {url, wss} = createWebsocketRpcServerMock((_ws, _data) => {})
 
             const wsSdk = WebSocketApi.createFromConfig({
                 url,
@@ -230,7 +219,13 @@ describe(__filename, () => {
                 wsSdk.rpc.ping()
             })
 
+            let isDone = false
             wsSdk.rpc.onPong(() => {
+                if (isDone) {
+                    return
+                }
+
+                isDone = true
                 expect(true).toEqual(true)
                 wsSdk.close()
                 wss.close()
@@ -410,7 +405,7 @@ describe(__filename, () => {
             })
 
             wsSdk.onMessage(() => {
-                if (resArray.length === 3) {
+                if (resArray.length === 2) {
                     expect(resArray).toEqual(messages)
                     wsSdk.close()
                     wss.close()
@@ -728,11 +723,14 @@ function createWebsocketRpcServerMock(
     wss: WebSocketServer
 } {
     const port = 8080
-    const returnUrl = `ws://localhost:${port}/websocket/v1.0/501`
+    const returnUrl = `ws://localhost:${port}/websocket`
     const wss = new WebSocketServer({port, path: '/websocket/v1.0/501'})
 
     wss.on('connection', (ws: WebSocket) => {
         ws.on('message', (data: unknown) => cb(ws, data))
+        ws.on('ping', () => {
+            ws.pong()
+        })
     })
 
     return {url: returnUrl, wss}

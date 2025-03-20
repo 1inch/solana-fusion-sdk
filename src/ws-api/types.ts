@@ -138,32 +138,20 @@ export class PaginationRequest {
     constructor(page: number | undefined, limit: number | undefined) {
         this.page = page
         this.limit = limit
+        this.validate()
     }
 
-    validate(): string | null {
+    private validate(): void {
         if (this.limit != null && (this.limit < 1 || this.limit > 500)) {
-            return 'limit should be in range between 1 and 500'
+            throw new Error('limit should be in range between 1 and 500')
         }
 
         if (this.page != null && this.page < 1) {
-            return `page should be >= 1`
+            throw new Error(`page should be >= 1`)
         }
-
-        return null
     }
 }
 
 export enum NetworkEnum {
-    ETHEREUM = 1,
-    POLYGON = 137,
-    ZKSYNC = 324,
-    BINANCE = 56,
-    ARBITRUM = 42161,
-    AVALANCHE = 43114,
-    OPTIMISM = 10,
-    FANTOM = 250,
-    GNOSIS = 100,
-    COINBASE = 8453,
-    LINEA = 59144,
     SOLANA = 501
 }
