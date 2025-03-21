@@ -357,7 +357,6 @@ describe(__filename, () => {
                     commitment: 'finalized',
                     orderHash: 'Cd7Y1XCsqtd8JGcjecgHHatKtkqyEGkr1h4TCsur14Ki',
                     maker: '49HbHjsigfRLhWriKTse77Bw7UPaMN29dGCxM2BfgfVz',
-                    resolver: '3k2mmTKz5oNDUv4n3TrxuvF5euYW2fZKHsk9frbQX8Ti',
                     order: {
                         id: 0,
                         fee: {
@@ -426,7 +425,6 @@ describe(__filename, () => {
                     commitment: 'finalized',
                     orderHash: 'Cd7Y1XCsqtd8JGcjecgHHatKtkqyEGkr1h4TCsur14Ki',
                     maker: '49HbHjsigfRLhWriKTse77Bw7UPaMN29dGCxM2BfgfVz',
-                    resolver: '3k2mmTKz5oNDUv4n3TrxuvF5euYW2fZKHsk9frbQX8Ti',
                     order: {
                         id: 0,
                         fee: {
@@ -496,7 +494,6 @@ describe(__filename, () => {
                     commitment: 'finalized',
                     orderHash: 'Cd7Y1XCsqtd8JGcjecgHHatKtkqyEGkr1h4TCsur14Ki',
                     maker: '49HbHjsigfRLhWriKTse77Bw7UPaMN29dGCxM2BfgfVz',
-                    resolver: '3k2mmTKz5oNDUv4n3TrxuvF5euYW2fZKHsk9frbQX8Ti',
                     order: {
                         id: 0,
                         fee: {
@@ -542,34 +539,6 @@ describe(__filename, () => {
                     orderHash: 'Cd7Y1XCsqtd8JGcjecgHHatKtkqyEGkr1h4TCsur14Ki',
                     maker: '49HbHjsigfRLhWriKTse77Bw7UPaMN29dGCxM2BfgfVz',
                     resolver: '3k2mmTKz5oNDUv4n3TrxuvF5euYW2fZKHsk9frbQX8Ti',
-                    order: {
-                        id: 0,
-                        fee: {
-                            protocolFee: 0,
-                            integratorFee: 0,
-                            protocolDstAta: null,
-                            integratorDstAta: null,
-                            surplusPercentage: 0,
-                            maxCancellationPremium: '1'
-                        },
-                        dstMint: 'So11111111111111111111111111111111111111112',
-                        srcMint: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
-                        receiver:
-                            '49HbHjsigfRLhWriKTse77Bw7UPaMN29dGCxM2BfgfVz',
-                        srcAmount: '1200000',
-                        minDstAmount: '6729670',
-                        expirationTime: 1742228896,
-                        nativeDstAsset: true,
-                        nativeSrcAsset: false,
-                        dutchAuctionData: {
-                            duration: 24,
-                            startTime: 1742228860,
-                            initialRateBump: 7039,
-                            pointsAndTimeDeltas: []
-                        },
-                        estimatedDstAmount: '6729670',
-                        cancellationAuctionDuration: 1
-                    },
                     filledAuctionTakerAmount: '12470402',
                     filledMakerAmount: '100000000'
                 }
@@ -611,7 +580,6 @@ describe(__filename, () => {
                     commitment: 'finalized',
                     orderHash: 'Cd7Y1XCsqtd8JGcjecgHHatKtkqyEGkr1h4TCsur14Ki',
                     maker: '49HbHjsigfRLhWriKTse77Bw7UPaMN29dGCxM2BfgfVz',
-                    resolver: '3k2mmTKz5oNDUv4n3TrxuvF5euYW2fZKHsk9frbQX8Ti',
                     order: {
                         id: 0,
                         fee: {
@@ -656,35 +624,6 @@ describe(__filename, () => {
                     commitment: 'finalized',
                     orderHash: 'Cd7Y1XCsqtd8JGcjecgHHatKtkqyEGkr1h4TCsur14Ki',
                     maker: '49HbHjsigfRLhWriKTse77Bw7UPaMN29dGCxM2BfgfVz',
-                    resolver: '3k2mmTKz5oNDUv4n3TrxuvF5euYW2fZKHsk9frbQX8Ti',
-                    order: {
-                        id: 0,
-                        fee: {
-                            protocolFee: 0,
-                            integratorFee: 0,
-                            protocolDstAta: null,
-                            integratorDstAta: null,
-                            surplusPercentage: 0,
-                            maxCancellationPremium: '1'
-                        },
-                        dstMint: 'So11111111111111111111111111111111111111112',
-                        srcMint: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
-                        receiver:
-                            '49HbHjsigfRLhWriKTse77Bw7UPaMN29dGCxM2BfgfVz',
-                        srcAmount: '1200000',
-                        minDstAmount: '6729670',
-                        expirationTime: 1742228896,
-                        nativeDstAsset: true,
-                        nativeSrcAsset: false,
-                        dutchAuctionData: {
-                            duration: 24,
-                            startTime: 1742228860,
-                            initialRateBump: 7039,
-                            pointsAndTimeDeltas: []
-                        },
-                        estimatedDstAmount: '6729670',
-                        cancellationAuctionDuration: 1
-                    },
                     filledAuctionTakerAmount: '12470402',
                     filledMakerAmount: '100000000'
                 }
