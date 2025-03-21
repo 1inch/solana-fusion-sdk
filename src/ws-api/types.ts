@@ -57,7 +57,7 @@ export type Event<K extends string, T> = {
     result: T
 }
 
-export type OrderEventPayload = {
+export type CreateOrderEventPayload = {
     transactionSignature: string
     slotNumber: number
     blockTime: number
@@ -65,17 +65,43 @@ export type OrderEventPayload = {
     commitment: string
     orderHash: string
     maker: string
-    resolver: string | undefined
-    order: Jsonify<FusionOrder> | undefined
-    filledAuctionTakerAmount: string | undefined
-    filledMakerAmount: string | undefined
+    order: Jsonify<FusionOrder>
+    filledAuctionTakerAmount: string
+    filledMakerAmount: string
 }
 
-export type OrderCreatedEvent = Event<EventType.Create, OrderEventPayload>
+export type FillOrderEventPayload = {
+    transactionSignature: string
+    slotNumber: number
+    blockTime: number
+    action: string
+    commitment: string
+    orderHash: string
+    maker: string
+    resolver: string
+    filledAuctionTakerAmount: string
+    filledMakerAmount: string
+}
+export type CancelOrderEventPayload = {
+    transactionSignature: string
+    slotNumber: number
+    blockTime: number
+    action: string
+    commitment: string
+    orderHash: string
+    maker: string
+    filledAuctionTakerAmount: string
+    filledMakerAmount: string
+}
 
-export type OrderFilledEvent = Event<EventType.Fill, OrderEventPayload>
+export type OrderCreatedEvent = Event<EventType.Create, CreateOrderEventPayload>
 
-export type OrderCancelledEvent = Event<EventType.Cancel, OrderEventPayload>
+export type OrderFilledEvent = Event<EventType.Fill, FillOrderEventPayload>
+
+export type OrderCancelledEvent = Event<
+    EventType.Cancel,
+    CancelOrderEventPayload
+>
 
 export type OrderEventType =
     | OrderCreatedEvent
