@@ -1,6 +1,6 @@
 import {WritableDeep} from 'type-fest'
 const _IDL = {
-    address: '5uzpYuGqBaetRMXPDtGWGN9W4mdmgBzpGHcQACrZ1npi',
+    address: 'HNarfxC3kYMMhFkxUFeYb8wHVdPzY5t9pupqW5fL2meM',
     metadata: {
         name: 'fusionSwap',
         version: '0.1.0',
@@ -21,7 +21,9 @@ const _IDL = {
                 {name: 'srcMint', docs: ['Maker asset']},
                 {
                     name: 'escrow',
-                    docs: ['Account to store order conditions'],
+                    docs: [
+                        'PDA derived from order details, acting as the authority for the escrow ATA'
+                    ],
                     pda: {
                         seeds: [
                             {
@@ -122,7 +124,12 @@ const _IDL = {
                 {name: 'makerReceiver'},
                 {name: 'srcMint', docs: ['Maker asset']},
                 {name: 'dstMint', docs: ['Taker asset']},
-                {name: 'escrow', docs: ['Account to store order conditions']},
+                {
+                    name: 'escrow',
+                    docs: [
+                        'PDA derived from order details, acting as the authority for the escrow ATA'
+                    ]
+                },
                 {
                     name: 'escrowSrcAta',
                     docs: ['ATA of src_mint to store escrowed tokens'],
@@ -187,7 +194,12 @@ const _IDL = {
                     name: 'systemProgram',
                     address: '11111111111111111111111111111111'
                 },
-                {name: 'escrow', docs: ['Account to store order conditions']},
+                {
+                    name: 'escrow',
+                    docs: [
+                        'PDA derived from order details, acting as the authority for the escrow ATA'
+                    ]
+                },
                 {name: 'srcMint', docs: ['Source asset']},
                 {name: 'srcTokenProgram'},
                 {
@@ -291,7 +303,12 @@ const _IDL = {
                 {name: 'makerReceiver', writable: true},
                 {name: 'srcMint', docs: ['Maker asset']},
                 {name: 'dstMint', docs: ['Taker asset']},
-                {name: 'escrow', docs: ['Account to store order conditions']},
+                {
+                    name: 'escrow',
+                    docs: [
+                        'PDA derived from order details, acting as the authority for the escrow ATA'
+                    ]
+                },
                 {
                     name: 'escrowSrcAta',
                     docs: ['ATA of src_mint to store escrowed tokens'],
