@@ -13,7 +13,7 @@ export class FusionSwapContract {
 
     private readonly coder = new BorshCoder(IDL)
 
-    private OPTIONAL_ACCOUNT_META: AccountMeta
+    private readonly OPTIONAL_ACCOUNT_META: AccountMeta
 
     constructor(public readonly programId: Address) {
         this.OPTIONAL_ACCOUNT_META = {
@@ -104,7 +104,7 @@ export class FusionSwapContract {
                 {
                     // 8. maker_receiver
                     pubkey: order.receiver,
-                    isWritable: false,
+                    isWritable: true,
                     isSigner: false
                 },
                 {
