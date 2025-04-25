@@ -1,6 +1,6 @@
 import {BN, BorshCoder} from '@coral-xyz/anchor'
 import assert from 'assert'
-import {TransactionInstruction} from './transaction-instruction'
+import {AccountMeta, TransactionInstruction} from './transaction-instruction'
 import {WhitelistContract} from './whitelist-contract'
 import {getAta} from '../utils/addresses/ata'
 import {FusionOrder} from '../fusion-order'
@@ -13,7 +13,15 @@ export class FusionSwapContract {
 
     private readonly coder = new BorshCoder(IDL)
 
-    constructor(public readonly programId: Address) {}
+    private OPTIONAL_ACCOUNT_META: AccountMeta
+
+    constructor(public readonly programId: Address) {
+        this.OPTIONAL_ACCOUNT_META = {
+            pubkey: this.programId,
+            isWritable: false,
+            isSigner: false
+        }
+    }
 
     static default(): FusionSwapContract {
         return new FusionSwapContract(FusionSwapContract.ADDRESS)
@@ -75,16 +83,18 @@ export class FusionSwapContract {
                     isSigner: true,
                     isWritable: true
                 },
-                {
-                    // 6. maker_src_ata
-                    pubkey: getAta(
-                        accounts.maker,
-                        order.srcMint,
-                        accounts.srcTokenProgram
-                    ),
-                    isWritable: true,
-                    isSigner: false
-                },
+                // 6. maker_src_ata
+                order.srcAssetIsNative
+                    ? this.OPTIONAL_ACCOUNT_META
+                    : {
+                          pubkey: getAta(
+                              accounts.maker,
+                              order.srcMint,
+                              accounts.srcTokenProgram
+                          ),
+                          isWritable: true,
+                          isSigner: false
+                      },
                 {
                     // 7. dst_mint
                     pubkey: order.dstMint,
@@ -238,11 +248,7 @@ export class FusionSwapContract {
                 },
                 // 13. maker_dst_ata
                 order.dstAssetIsNative
-                    ? {
-                          pubkey: this.programId,
-                          isWritable: false,
-                          isSigner: false
-                      }
+                    ? this.OPTIONAL_ACCOUNT_META
                     : {
                           pubkey: getAta(
                               order.receiver,
@@ -254,11 +260,7 @@ export class FusionSwapContract {
                       },
                 // 14. taker_dst_ata
                 order.dstAssetIsNative
-                    ? {
-                          pubkey: this.programId,
-                          isWritable: false,
-                          isSigner: false
-                      }
+                    ? this.OPTIONAL_ACCOUNT_META
                     : {
                           pubkey: getAta(
                               accounts.taker,
@@ -270,11 +272,7 @@ export class FusionSwapContract {
                       },
                 // 15. protocol_dst_ata
                 order.dstAssetIsNative || !order.fees?.protocolDstAta
-                    ? {
-                          pubkey: this.programId,
-                          isWritable: false,
-                          isSigner: false
-                      }
+                    ? this.OPTIONAL_ACCOUNT_META
                     : {
                           pubkey: order.fees.protocolDstAta,
                           isWritable: true,
@@ -282,11 +280,7 @@ export class FusionSwapContract {
                       },
                 // 16. integrator_dst_ata
                 order.dstAssetIsNative || !order.fees?.integratorDstAta
-                    ? {
-                          pubkey: this.programId,
-                          isWritable: false,
-                          isSigner: false
-                      }
+                    ? this.OPTIONAL_ACCOUNT_META
                     : {
                           pubkey: order.fees.integratorDstAta,
                           isWritable: true,
@@ -348,16 +342,18 @@ export class FusionSwapContract {
                     isWritable: true,
                     isSigner: false
                 },
-                {
-                    // 5. maker_src_ata
-                    pubkey: getAta(
-                        accounts.maker,
-                        order.srcMint,
-                        accounts.srcTokenProgram
-                    ),
-                    isWritable: true,
-                    isSigner: false
-                },
+                // 5. maker_src_ata
+                order.srcAssetIsNative
+                    ? this.OPTIONAL_ACCOUNT_META
+                    : {
+                          pubkey: getAta(
+                              accounts.maker,
+                              order.srcMint,
+                              accounts.srcTokenProgram
+                          ),
+                          isWritable: true,
+                          isSigner: false
+                      },
                 {
                     // 6. src_token_program
                     pubkey: accounts.srcTokenProgram,
@@ -462,17 +458,18 @@ export class FusionSwapContract {
                     isWritable: true,
                     isSigner: false
                 },
-                {
-                    // 9. maker_src_ata
-                    pubkey: getAta(
-                        accounts.maker,
-                        order.srcMint,
-                        accounts.srcTokenProgram
-                    ),
-                    isWritable: true,
-                    isSigner: false
-                },
-
+                // 9. maker_src_ata
+                order.srcAssetIsNative
+                    ? this.OPTIONAL_ACCOUNT_META
+                    : {
+                          pubkey: getAta(
+                              accounts.maker,
+                              order.srcMint,
+                              accounts.srcTokenProgram
+                          ),
+                          isWritable: true,
+                          isSigner: false
+                      },
                 {
                     // 10. src token program
                     pubkey: accounts.srcTokenProgram,
@@ -487,11 +484,7 @@ export class FusionSwapContract {
                 },
                 // 12. protocol_dst_ata
                 order.dstAssetIsNative || !order.fees?.protocolDstAta
-                    ? {
-                          pubkey: this.programId,
-                          isWritable: false,
-                          isSigner: false
-                      }
+                    ? this.OPTIONAL_ACCOUNT_META
                     : {
                           pubkey: order.fees.protocolDstAta,
                           isWritable: true,
@@ -499,11 +492,7 @@ export class FusionSwapContract {
                       },
                 // 13. integrator_dst_ata
                 order.dstAssetIsNative || !order.fees?.integratorDstAta
-                    ? {
-                          pubkey: this.programId,
-                          isWritable: false,
-                          isSigner: false
-                      }
+                    ? this.OPTIONAL_ACCOUNT_META
                     : {
                           pubkey: order.fees.integratorDstAta,
                           isWritable: true,

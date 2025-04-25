@@ -14,7 +14,7 @@ const _IDL = {
             docs: ['Removes a user from the whitelist'],
             discriminator: [161, 178, 39, 189, 231, 224, 13, 187],
             accounts: [
-                {name: 'owner', writable: true, signer: true},
+                {name: 'authority', writable: true, signer: true},
                 {
                     name: 'whitelistState',
                     pda: {
@@ -54,10 +54,10 @@ const _IDL = {
         },
         {
             name: 'initialize',
-            docs: ['Initializes the whitelist with the owner'],
+            docs: ['Initializes the whitelist with the authority'],
             discriminator: [175, 175, 109, 31, 13, 152, 155, 237],
             accounts: [
-                {name: 'owner', writable: true, signer: true},
+                {name: 'authority', writable: true, signer: true},
                 {
                     name: 'whitelistState',
                     writable: true,
@@ -85,7 +85,7 @@ const _IDL = {
             docs: ['Registers a new user to the whitelist'],
             discriminator: [211, 124, 67, 15, 211, 194, 178, 240],
             accounts: [
-                {name: 'owner', writable: true, signer: true},
+                {name: 'authority', writable: true, signer: true},
                 {
                     name: 'whitelistState',
                     pda: {
@@ -124,11 +124,11 @@ const _IDL = {
             args: [{name: 'user', type: 'pubkey'}]
         },
         {
-            name: 'transferOwnership',
-            docs: ['Transfers ownership of the whitelist to a new owner'],
-            discriminator: [65, 177, 215, 73, 53, 45, 99, 47],
+            name: 'setAuthority',
+            docs: ['Sets the new whitelist authority'],
+            discriminator: [133, 250, 37, 21, 110, 163, 26, 121],
             accounts: [
-                {name: 'currentOwner', writable: true, signer: true},
+                {name: 'currentAuthority', writable: true, signer: true},
                 {
                     name: 'whitelistState',
                     writable: true,
@@ -145,7 +145,7 @@ const _IDL = {
                     }
                 }
             ],
-            args: [{name: 'newOwner', type: 'pubkey'}]
+            args: [{name: 'newAuthority', type: 'pubkey'}]
         }
     ],
     accounts: [
@@ -158,14 +158,18 @@ const _IDL = {
             discriminator: [246, 118, 44, 60, 71, 37, 201, 55]
         }
     ],
-    errors: [
-        {code: 6000, name: 'unauthorizedOwner', msg: 'Unauthorized owner'}
-    ],
+    errors: [{code: 6000, name: 'unauthorized', msg: 'Unauthorized'}],
     types: [
-        {name: 'resolverAccess', type: {kind: 'struct', fields: []}},
+        {
+            name: 'resolverAccess',
+            type: {kind: 'struct', fields: [{name: 'bump', type: 'u8'}]}
+        },
         {
             name: 'whitelistState',
-            type: {kind: 'struct', fields: [{name: 'owner', type: 'pubkey'}]}
+            type: {
+                kind: 'struct',
+                fields: [{name: 'authority', type: 'pubkey'}]
+            }
         }
     ]
 } as const
