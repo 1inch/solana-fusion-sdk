@@ -1,7 +1,8 @@
 import {BN, BorshCoder} from '@coral-xyz/anchor'
 import * as borsh from 'borsh'
 import {UINT_64_MAX} from '@1inch/byte-utils'
-import * as crypto from 'node:crypto'
+import bs58 from 'bs58'
+import * as crypto from 'crypto'
 import {Buffer} from 'buffer'
 import assert from 'assert'
 import {AuctionDetails} from './auction-details'
@@ -507,6 +508,10 @@ export class FusionOrder {
             .update(borsh.serialize(AddressSchema, this.dstMint.toBuffer()))
             .update(borsh.serialize(AddressSchema, this.receiver.toBuffer()))
             .digest()
+    }
+
+    public getOrderHashBase58(): string {
+        return bs58.encode(this.getOrderHash())
     }
 
     /**

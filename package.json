@@ -22,6 +22,13 @@
       "require": "./dist/cjs/utils.js",
       "node": "./dist/cjs/utils.js",
       "default": "./dist/cjs/utils.js"
+    },
+    "./axios": {
+      "types": "./dist/types/src/axios.ext.d.ts",
+      "import": "./dist/esm/axios.ext.js",
+      "require": "./dist/cjs/axios.ext.js",
+      "node": "./dist/cjs/axios.ext.js",
+      "default": "./dist/cjs/axios.ext.js"
     }
   },
   "files": [
@@ -64,6 +71,7 @@
     "@types/ws": "^8.18.0",
     "@typescript-eslint/eslint-plugin": "~8.24.1",
     "@typescript-eslint/parser": "~8.24.1",
+    "axios": "1.9.0",
     "camelcase": "8.0.0",
     "eslint": "9.20.1",
     "eslint-config-prettier": "~10.0.1",
@@ -105,5 +113,16 @@
     "tslib": "2.8.1",
     "type-fest": "4.35.0",
     "ws": "^8.18.1"
+  },
+  "peerDependencies": {
+    "axios": "^1"
+  },
+  "peerDependenciesMeta": {
+      "axios": {
+          "optional": true
+      },
+      "assert": {
+          "optional": true
+      }
   }
 }
