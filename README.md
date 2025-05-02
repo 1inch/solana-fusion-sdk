@@ -13,7 +13,8 @@ Add to `package.json`
 ```
 
 ## Docs
-- [SDK](./src/sdk/README.md)
+- [FusionOrder](./fusion-order/README.md)
+- [SDK](./sdk/README.md)
 - [Websocket Api](./src/ws-api/README.md)
 
 ## Getting started
