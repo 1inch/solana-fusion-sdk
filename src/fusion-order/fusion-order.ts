@@ -102,12 +102,16 @@ export class FusionOrder {
             : this.orderConfig.resolverCancellationConfig
     }
 
+    get srcMint(): Address {
+        return this.orderConfig.srcMint
+    }
+
     get dstMint(): Address {
         return this.orderConfig.dstMint
     }
 
-    get srcMint(): Address {
-        return this.orderConfig.srcMint
+    get srcAmount(): bigint {
+        return this.orderConfig.srcAmount
     }
 
     get minDstAmount(): bigint {
@@ -116,10 +120,6 @@ export class FusionOrder {
 
     get estimatedDstAmount(): bigint {
         return this.orderConfig.estimatedDstAmount
-    }
-
-    get srcAmount(): bigint {
-        return this.orderConfig.srcAmount
     }
 
     /**
@@ -540,8 +540,8 @@ export class FusionOrder {
     /**
      * Calculates required taking amount to fill order for passed `makingAmount` at block time `time`
      *
-     * @param time execution time in sec
      * @param makingAmount maker swap amount
+     * @param time execution time in sec
      * */
     public calcTakingAmount(makingAmount: bigint, time: number): bigint {
         const takingAmount = AmountCalculator.calcTakingAmount(

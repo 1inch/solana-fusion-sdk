@@ -1,6 +1,6 @@
 # SDK interact with Fusion protocol
 
-**Description:** create, cancel, check order status and more
+Create, cancel, check order status and more
 
 ## Real world example
 
@@ -101,7 +101,7 @@ const sdk = new Sdk(new MyProvider(), { baseUrl: 'https://api.1inch.dev/fusion',
 - [1] dstToken: [Address](../domains/address.ts) dst token mint address
 - [2] amount: bigint src amount
 - [3] signer: [Address](../domains/address.ts) user address
-- [4] slippage?: Bps max slippage
+- [4] slippage?: [Bps](../domains/bps.ts) max slippage
 
 **Returns:** [Quote](./quote.ts)
 
@@ -114,7 +114,7 @@ const sdk = new Sdk(new MyProvider(), { baseUrl: 'https://api.1inch.dev/fusion',
 - [1] dstToken: [Address](../domains/address.ts) dst token mint address
 - [2] amount: bigint src amount
 - [3] signer: [Address](../domains/address.ts) user address
-- [4] slippage?: Bps max slippage
+- [4] slippage?: [Bps](../domains/bps.ts) max slippage
 
 **Returns:** [FusionOrder](../fusion-order/fusion-order.ts)
 
@@ -122,6 +122,6 @@ const sdk = new Sdk(new MyProvider(), { baseUrl: 'https://api.1inch.dev/fusion',
 **Description:** get order status
 
 **Arguments:**
-- [0] orderHash: string use `FusionOrder.getOrderHashBase58` to get order hash
+- [0] orderHash: string use [FusionOrder.getOrderHashBase58](https://github.com/1inch/solana-fusion-sdk/blob/6cb4346342824c1419ff242529da2aa23883082c/src/fusion-order/fusion-order.ts#L513) to get order hash
 
 **Returns:** [OrderStatus](./order-status.ts)

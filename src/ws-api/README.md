@@ -1,6 +1,6 @@
 # Websocket Api
 
-**Description**: subscribe to real time fusion events
+Subscribe to real time fusion events
 
 ## Real world example
 
