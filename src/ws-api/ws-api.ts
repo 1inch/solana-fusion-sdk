@@ -46,11 +46,11 @@ export class WebSocketApi {
         )
     }
 
-    static createFromConfig(config: WsApiConfig): WebSocketApi {
+    static fromConfig(config: WsApiConfig): WebSocketApi {
         return new WebSocketApi(config, true)
     }
 
-    static createFromProvider(provider: WsProviderConnector): WebSocketApi {
+    static fromProvider(provider: WsProviderConnector): WebSocketApi {
         return new WebSocketApi(provider, false)
     }
 

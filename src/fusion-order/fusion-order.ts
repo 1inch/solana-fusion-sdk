@@ -194,8 +194,8 @@ export class FusionOrder {
             auctionDetails,
             {
                 ...extra,
-                srcAssetIsNative: orderInfo.srcMint.equal(Address.NATIVE),
-                dstAssetIsNative: orderInfo.dstMint.equal(Address.NATIVE)
+                srcAssetIsNative: orderInfo.srcMint.isNative(),
+                dstAssetIsNative: orderInfo.dstMint.isNative()
             }
         )
     }

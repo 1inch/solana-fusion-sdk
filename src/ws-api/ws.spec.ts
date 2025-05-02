@@ -23,7 +23,7 @@ describe(__filename, () => {
             const message = {id: 1}
             const {wss, url} = createWebsocketServerMock([message])
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })
@@ -40,7 +40,7 @@ describe(__filename, () => {
             const message = {id: 1}
             const {wss, url} = createWebsocketServerMock([message])
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })
@@ -56,7 +56,7 @@ describe(__filename, () => {
             const message = {id: 1}
             const {wss, url} = createWebsocketServerMock([message])
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })
@@ -71,7 +71,7 @@ describe(__filename, () => {
 
         // TODO repair waiting a lot of time ....
         it.skip('should be possible to subscribe to error', (done) => {
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url: 'ws://localhost:2345'
             })
 
@@ -95,7 +95,7 @@ describe(__filename, () => {
                 }
             })
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 lazyInit: true,
                 authKey: ''
@@ -117,7 +117,7 @@ describe(__filename, () => {
         })
 
         it('should be safe to call methods on uninitialized ws', () => {
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url: 'random',
                 lazyInit: true
             })
@@ -138,7 +138,7 @@ describe(__filename, () => {
                 }
             })
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 lazyInit: false
             })
@@ -171,7 +171,7 @@ describe(__filename, () => {
             const urlWithNetwork = `${castedUrl}/v1.0/501`
             const provider = new WebsocketClient({url: urlWithNetwork})
 
-            const wsSdk = WebSocketApi.createFromProvider(provider)
+            const wsSdk = WebSocketApi.fromProvider(provider)
 
             expect(wsSdk.rpc).toBeDefined()
             expect(wsSdk.order).toBeDefined()
@@ -191,7 +191,7 @@ describe(__filename, () => {
             const message = {id: 1}
             const {wss, url} = createWebsocketServerMock([message])
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })
@@ -211,7 +211,7 @@ describe(__filename, () => {
         it('can ping pong', (done) => {
             const {url, wss} = createWebsocketRpcServerMock((_ws, _data) => {})
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })
@@ -251,7 +251,7 @@ describe(__filename, () => {
                 }
             })
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })
@@ -289,7 +289,7 @@ describe(__filename, () => {
                 }
             })
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })
@@ -327,7 +327,7 @@ describe(__filename, () => {
                 }
             })
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })
@@ -394,7 +394,7 @@ describe(__filename, () => {
             const messages = [message1, message1]
             const {url, wss} = createWebsocketServerMock(messages)
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })
@@ -463,7 +463,7 @@ describe(__filename, () => {
             const expectedMessages = [message1, message1]
             const {url, wss} = createWebsocketServerMock(messages)
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })
@@ -549,7 +549,7 @@ describe(__filename, () => {
             const expectedMessages = [message2]
             const {url, wss} = createWebsocketServerMock(messages)
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })
@@ -634,7 +634,7 @@ describe(__filename, () => {
             const expectedMessages = [message2]
             const {url, wss} = createWebsocketServerMock(messages)
 
-            const wsSdk = WebSocketApi.createFromConfig({
+            const wsSdk = WebSocketApi.fromConfig({
                 url,
                 authKey: ''
             })

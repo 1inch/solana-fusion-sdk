@@ -1,25 +1,8 @@
-# Solana Fusion SDK
+# SDK interact with Fusion protocol
 
+**Description:** create, cancel, check order status and more
 
-## Installation
-
-Add to `package.json`
-```json
-{
-  "dependencies": {
-    "@1inch/solana-fusion-sdk": "https://github.com/1inch/solana-fusion-sdk#latest"
-  }
-}
-```
-
-## Docs
-- [SDK](./src/sdk/README.md)
-- [Websocket Api](./src/ws-api/README.md)
-
-## Getting started
-
-### For user
-**Create and submit order:**
+## Real world example
 
 ```typescript
 import { Address, FusionSwapContract, Sdk } from '@1inch/solana-fusion-sdk'
@@ -83,3 +66,62 @@ export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 ```
+
+## Creation
+
+**with axios provider**
+```typescript
+
+import { Address, FusionSwapContract, Sdk } from '@1inch/solana-fusion-sdk'
+import { AxiosHttpProvider } from '@1inch/solana-fusion-sdk/axios'
+
+const sdk = new Sdk(new AxiosHttpProvider(), { baseUrl: 'https://api.1inch.dev/fusion', authKey: 'your key', version: 'v1.0' })
+```
+
+
+**with custom provider**
+```typescript
+
+import { Address, FusionSwapContract, Sdk, HttpProvider } from '@1inch/solana-fusion-sdk'
+
+class MyProvider implements HttpProvider {
+  // implement methods
+}
+
+const sdk = new Sdk(new MyProvider(), { baseUrl: 'https://api.1inch.dev/fusion', authKey: 'your key', version: 'v1.0' })
+```
+
+## Methods
+
+### getQuote
+**Description:** get quote for order
+
+**Arguments:**
+- [0] srcToken: [Address](../domains/address.ts) src token mint address
+- [1] dstToken: [Address](../domains/address.ts) dst token mint address
+- [2] amount: bigint src amount
+- [3] signer: [Address](../domains/address.ts) user address
+- [4] slippage?: Bps max slippage
+
+**Returns:** [Quote](./quote.ts)
+
+
+### createOrder
+**Description:** create fusion order
+
+**Arguments:**
+- [0] srcToken: [Address](../domains/address.ts) src token mint address
+- [1] dstToken: [Address](../domains/address.ts) dst token mint address
+- [2] amount: bigint src amount
+- [3] signer: [Address](../domains/address.ts) user address
+- [4] slippage?: Bps max slippage
+
+**Returns:** [FusionOrder](../fusion-order/fusion-order.ts)
+
+### getOrderStatus
+**Description:** get order status
+
+**Arguments:**
+- [0] orderHash: string use `FusionOrder.getOrderHashBase58` to get order hash
+
+**Returns:** [OrderStatus](./order-status.ts)

@@ -1,13 +1,13 @@
 # Websocket Api
 
-**Description:** provides high level functionality to working with fusion mode
+**Description**: subscribe to real time fusion events
 
 ## Real world example
 
 ```typescript
 import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
-const wsSdk = new WebSocketApi({
+const wsSdk = WebSocketApi.fromConfig({
     url: 'wss://api.1inch.dev/fusion/ws',
     authKey: 'your-auth-key'
 })
@@ -19,12 +19,12 @@ wsSdk.order.onOrder((data) => {
 
 ## Creation
 
-**With constructor:**
+**With config:**
 
 ```typescript
 import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
-const ws = new WebSocketApi({
+const ws = WebSocketApi.fromConfig({
     url: 'wss://api.1inch.dev/fusion/ws',
     authKey: 'your-auth-key'
 })
@@ -44,27 +44,19 @@ class MyFancyProvider extends WsProviderConnector {
 const url = 'wss://api.1inch.dev/fusion/ws/v1.0/501'
 const provider = new MyFancyProvider({url})
 
-const wsSdk = new WebSocketApi(provider)
+const wsSdk = WebSocketApi.fromProvider(provider)
 ```
 
-**With new static method:**
-
-```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = WebSocketApi.new({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
-```
 
 **Lazy initialization:**
 
-By default, when user creates an instance of WebSocketApi, it automatically opens websocket connection which might be a problem for some use cases
+By default, when user creates an instance of WebSocketApi, it automatically opens websocket connection which might be a problem for some use cases.
+It is possible to pass `lazyInit` flag to prevent automatic initialization. Then to use client you need to call `init()` method.
 
 ```typescript
 import {WebSocketApi} from '@1inch/solana-fusion-sdk'
 
-const ws = new WebSocketApi({
+const ws = WebSocketApi.fromConfig({
     url: 'wss://api.1inch.dev/fusion/ws',
     lazyInit: true
 })
@@ -82,17 +74,15 @@ ws.init()
 
 **Arguments**:
 
--   [0] event: string
+-   [0] event: WebSocketEvent
 -   [1] cb: Function
 
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
+import {WebSocketEvent} from '@1inch/solana-fusion-sdk'
 
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
+const ws = ...
 
 ws.on(WebSocketEvent.Error, console.error)
 
@@ -111,23 +101,15 @@ ws.on(WebSocketEvent.Message, function message(data) {
 
 **Arguments**:
 
--   [0] event: string
--   [1] сb: Function
+-   [0] event: WebSocketEvent
+-   [1] cb: Function
 
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
+import {WebSocketEvent} from '@1inch/solana-fusion-sdk'
 
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
-
-ws.on(WebSocketEvent.Error, console.error)
-
-ws.on(WebSocketEvent.Open, function open() {
-    ws.send('something')
-})
+const ws = ...
 
 function message(data) {
     console.log('received: %s', data)
@@ -149,12 +131,7 @@ ws.off(WebSocketEvent.Message, message)
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
-
+const ws = ...
 ws.onOpen(() => {
     console.log('connection is opened')
 })
@@ -171,11 +148,7 @@ ws.onOpen(() => {
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
+const ws = ...
 
 ws.send('my message')
 ```
@@ -187,11 +160,7 @@ ws.send('my message')
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
+const ws = ...
 
 ws.close()
 ```
@@ -207,11 +176,8 @@ ws.close()
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
+const ws = ...
 
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
 
 ws.onMessage((data) => {
     console.log('message received', data)
@@ -225,11 +191,8 @@ ws.onMessage((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
+const ws = ...
 
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
 
 ws.onClose(() => {
     console.log('connection is closed')
@@ -247,11 +210,8 @@ ws.onClose(() => {
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
+const ws = ...
 
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
 
 ws.onError((error) => {
     console.log('error is received', error)
@@ -271,17 +231,15 @@ ws.onError((error) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi, EventType} from '@1inch/solana-fusion-sdk'
+import {EventType} from '@1inch/solana-fusion-sdk'
 
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
+const ws = ...
 
 ws.order.onOrder((data) => {
     if (data.event === EventType.Create) {
         // do something
     }
-    
+
     if (data.event === EventType.Fill) {
         // do something
     }
@@ -299,11 +257,7 @@ ws.order.onOrder((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
+const ws = ...
 
 ws.order.onOrderCreated((data) => {
     // do something
@@ -321,11 +275,7 @@ ws.order.onOrderCreated((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
+const ws = ...
 
 ws.order.onOrderFilled((data) => {
     // do something
@@ -343,11 +293,7 @@ ws.order.onOrderFilled((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
+const ws = ...
 
 ws.order.onOrderCancelled((data) => {
     // do something
@@ -360,20 +306,12 @@ ws.order.onOrderCancelled((data) => {
 
 **Description:** subscribe to ping response
 
-**Arguments:**
-
--   [0] cb: (data: string) => void
-
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
+const ws = ...
 
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
-
-ws.rpc.onPong((data) => {
+ws.rpc.onPong(() => {
     // do something
 })
 ```
@@ -385,12 +323,7 @@ ws.rpc.onPong((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
-
+const ws = ...
 ws.rpc.ping()
 ```
 
@@ -401,12 +334,7 @@ ws.rpc.ping()
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
-
+const ws = ...
 ws.rpc.getAllowedMethods()
 ```
 
@@ -421,11 +349,7 @@ ws.rpc.getAllowedMethods()
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
+const ws = ...
 
 ws.rpc.onGetAllowedMethods((data) => {
     // do something
@@ -439,11 +363,7 @@ ws.rpc.onGetAllowedMethods((data) => {
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
+const ws = ...
 
 ws.rpc.getActiveOrders()
 ```
@@ -454,16 +374,12 @@ ws.rpc.getActiveOrders()
 
 **Arguments:**
 
--   [0] cb: (data: PaginationOutput\<ActiveOrder\>) => void
+-   [0] cb: (data: PaginationOutput<ActiveOrder>[]) => void
 
 **Example:**
 
 ```typescript
-import {WebSocketApi} from '@1inch/solana-fusion-sdk'
-
-const ws = new WebSocketApi({
-    url: 'wss://api.1inch.dev/fusion/ws'
-})
+const ws = ...
 
 ws.rpc.onGetActiveOrders((data) => {
     // do something
