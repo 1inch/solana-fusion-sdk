@@ -120,54 +120,69 @@ const order = FusionOrder.fromJSON({
 
 ### getOrderHash
 **Description:** Calculate `sha256` of order params
+
 **Returns:** `Buffer` order hash as bytes
 
 ### getOrderHashBase58
 **Description:** Calculate `sha256` of order params
+
 **Returns:** `string` order hash as base 58 encoded string
 
 ### getEscrow
 **Description:** Returns escrow [ata](https://spl.solana.com/associated-token-account) for src token
+
 **Arguments:**
 - [0] maker `AddressLike`
 - [1] srcTokenProgram `AddressLike` owner of src token mint
 - [2] programId `AddressLike` FusionSwap program id
+
 **Returns:** [Address](./address/address.ts) escrow ata address
 
 ### calcTakingAmount
 **Description:** Calculate `dstAmount` for given `srcAmount` at block `time`
+
 **Arguments:**
 - [0] srcAmount `bigint` source amount to fill
 - [1] time `number` UNIX timestamp in sec at which fill will be executed
+
 **Returns:** dstAmount `bigint` how much resolver must provide
 
 ### getUserReceiveAmount
 **Description:** Calculate how much user will receive in dst token
+
 **Arguments:**
 - [0] srcAmount `bigint` source amount to fill
 - [1] time `number` UNIX timestamp in sec at which fill will be executed
+
 **Returns:** dstAmount `bigint` how much user will receive
 
 ### getIntegratorFee
 **Description:** Calculate how much `dstToken` integrator will receive
+
 **Arguments:**
 - [0] srcAmount `bigint` source amount to fill
 - [1] time `number` UNIX timestamp in sec at which fill will be executed
+
 **Returns:** feeAmount `bigint` how much integrator will receive
 
 ### getProtocolFee
 **Description:** Calculate how much `dstToken` protocol will receive
+
 **Arguments:**
 - [0] srcAmount `bigint` source amount to fill
 - [1] time `number` UNIX timestamp in sec at which fill will be executed
+
 **Returns:** feeAmount `bigint` how much protocol will receive
 
 ### isExpiredAt
 **Description:** Check if order expired at given time
+
 **Arguments:**
 - [0] time `number` UNIX timestamp in sec
+
 **Returns:** isExpired `boolean` true if order expired at given time
 
 ### getCalculator
 **Description:** Build [AmountCalculator](../amount-calculator/amount-calculator.ts) based on order params
+
 **Returns:** [AmountCalculator](../amount-calculator/amount-calculator.ts)
