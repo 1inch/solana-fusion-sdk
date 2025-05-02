@@ -72,10 +72,10 @@ const order = FusionOrder.fromJSON({
 **Returns:** [ResolverCancellationConfig](./resolver-cancellation-config/resolver-cancellation-config.ts) or `null` if order can not be cancelled by resolver
 
 ### srcMint
-**Returns:** [Address](./address/address.ts) of source mint
+**Returns:** [Address](../domains/address.ts) of source mint
 
 ### dstMint
-**Returns:** [Address](./address/address.ts) of destination mint
+**Returns:** [Address](../domains/address.ts) of destination mint
 
 ### srcAmount
 **Returns:** `bigint` source amount
@@ -87,7 +87,7 @@ const order = FusionOrder.fromJSON({
 **Returns:** `bigint` estimated destination amount
 
 ### receiver
-**Returns:** [Address](./address/address.ts) of receiver of funds
+**Returns:** [Address](../domains/address.ts) of receiver of funds
 
 ### deadline
 **Returns:** `number` UNIX timestamp of order expiration time (in sec)
@@ -136,7 +136,7 @@ const order = FusionOrder.fromJSON({
 - [1] srcTokenProgram `AddressLike` owner of src token mint
 - [2] programId `AddressLike` FusionSwap program id
 
-**Returns:** [Address](./address/address.ts) escrow ata address
+**Returns:** [Address](../domains/address.ts) escrow ata address
 
 ### calcTakingAmount
 **Description:** Calculate `dstAmount` for given `srcAmount` at block `time`
