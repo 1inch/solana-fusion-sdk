@@ -51,6 +51,11 @@ export type OrderInfoDTO = {
     remainingMakerAmount: string
 }
 
+export type OrderCancellableByResolverInfoDTO = Omit<
+    OrderInfoDTO,
+    'remainingMakerAmount'
+>
+
 export type OrderDTO = {
     id: number
     srcAmount: string

@@ -1,8 +1,10 @@
 import {Quote} from './quote'
 import {OrderStatus} from './order-status'
+import {CancellableOrder} from './cancellable-order'
+import {ActiveOrder} from './active-order'
 import {FusionOrder} from '../fusion-order'
 import {Address, Bps} from '../domains'
-import {ApiConfig, HttpProvider, OrdersApi, QuoterApi} from '../api'
+import {ApiConfig, HttpProvider, OrdersApi, Pagination, QuoterApi} from '../api'
 
 export class Sdk {
     private readonly ordersApi: OrdersApi
@@ -55,5 +57,38 @@ export class Sdk {
         const orderStatus = await this.ordersApi.getOrderStatus(orderHash)
 
         return OrderStatus.fromJSON(orderStatus)
+    }
+
+    public async getOrdersCancellableByResolver(
+        page = 1,
+        limit = 100
+    ): Promise<Pagination<CancellableOrder>> {
+        const res = await this.ordersApi.getOrdersCancellableByResolver(
+            page,
+            limit
+        )
+
+        return {
+            ...res,
+            items: res.items.map(
+                (o) =>
+                    new CancellableOrder(
+                        new Address(o.maker),
+                        FusionOrder.fromJSON(o.order)
+                    )
+            )
+        }
+    }
+
+    public async getActiveOrders(
+        page = 1,
+        limit = 100
+    ): Promise<Pagination<ActiveOrder>> {
+        const res = await this.ordersApi.getActiveOrders(page, limit)
+
+        return {
+            ...res,
+            items: res.items.map((o) => ActiveOrder.fromJSON(o))
+        }
     }
 }

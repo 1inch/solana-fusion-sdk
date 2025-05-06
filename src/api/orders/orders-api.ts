@@ -1,4 +1,8 @@
-import {OrderInfoDTO, OrderStatusDTO} from './types'
+import {
+    OrderCancellableByResolverInfoDTO,
+    OrderInfoDTO,
+    OrderStatusDTO
+} from './types'
 import {ApiConfig, HttpProvider, Pagination, Headers} from '../types'
 
 export class OrdersApi {
@@ -31,6 +35,16 @@ export class OrdersApi {
     public async getOrderStatus(orderHash: string): Promise<OrderStatusDTO> {
         return this.httpClient.get(
             `${this.baseUrl}/order/status/${orderHash}`,
+            this.headers
+        )
+    }
+
+    public async getOrdersCancellableByResolver(
+        page = 1,
+        limit = 100
+    ): Promise<Pagination<OrderCancellableByResolverInfoDTO>> {
+        return this.httpClient.get(
+            `${this.baseUrl}/order/cancelable-by-resolvers?limit=${limit}&page=${page}`,
             this.headers
         )
     }
