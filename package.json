@@ -1,6 +1,6 @@
 {
   "name": "@1inch/solana-fusion-sdk",
-  "version": "0.1.14",
+  "version": "0.1.15-rc.0",
   "description": "SDK for fusion on Solana",
   "author": "@1inch",
   "license": "MIT",
