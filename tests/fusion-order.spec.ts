@@ -27,6 +27,7 @@ describe('FusionSwap', () => {
     const srcToken = Keypair.generate()
     const dstToken = Keypair.generate()
     const maker = Keypair.generate()
+    const customReceiver = Keypair.generate()
     const resolver = Keypair.generate()
     const owner = Keypair.generate()
     const whitelistProgramId = new PublicKey(
@@ -200,6 +201,115 @@ describe('FusionSwap', () => {
         expect(srcEscrowAta).toEqual(-srcTakerAta)
         expect(dstMakerAta).toEqual(-dstTakerAta)
         expect(dstMakerAta).toEqual(order.minDstAmount)
+        expect(srcTakerAta).toEqual(order.srcAmount)
+        // endregion fill
+    })
+
+    it('should fill order with different receiver', async () => {
+        const order = FusionOrder.new(
+            {
+                srcMint: Address.fromPublicKey(srcToken.publicKey),
+                dstMint: Address.fromPublicKey(dstToken.publicKey),
+                srcAmount: BigInt(sol(0.1)),
+                minDstAmount: BigInt(sol(0.02)),
+                estimatedDstAmount: BigInt(sol(0.02)),
+                id: id(),
+                receiver: Address.fromPublicKey(customReceiver.publicKey)
+            },
+            AuctionDetails.noAuction(now(), 180)
+        )
+
+        const contract = FusionSwapContract.default()
+
+        // region create escrow
+        const ix = contract.create(order, {
+            maker: Address.fromPublicKey(maker.publicKey),
+            srcTokenProgram: Address.fromPublicKey(TOKEN_PROGRAM_ID)
+        })
+
+        const initTx = new Transaction().add({
+            ...ix,
+            programId: new PublicKey(ix.programId.toBuffer()),
+            keys: ix.accounts.map((a) => ({
+                ...a,
+                pubkey: new PublicKey(a.pubkey.toBuffer())
+            }))
+        })
+
+        initTx.recentBlockhash = programTestCtx.lastBlockhash
+        initTx.sign(maker)
+
+        const [makerDiff, escrowDiff] = await withBalanceChanges(
+            programTestCtx,
+            () => programTestCtx.banksClient.processTransaction(initTx),
+            [
+                getAta(
+                    maker.publicKey,
+                    srcToken.publicKey,
+                    Address.TOKEN_PROGRAM_ID
+                ),
+                order.getEscrow(maker.publicKey)
+            ]
+        )
+
+        expect(makerDiff).toEqual(-order.srcAmount)
+        expect(escrowDiff).toEqual(order.srcAmount)
+
+        // endregion create escrow
+
+        // region fill
+        const ix2 = contract.fill(order, order.srcAmount, {
+            maker: Address.fromPublicKey(maker.publicKey),
+            taker: Address.fromPublicKey(resolver.publicKey),
+            srcTokenProgram: Address.fromPublicKey(TOKEN_PROGRAM_ID),
+            dstTokenProgram: Address.fromPublicKey(TOKEN_PROGRAM_ID)
+        })
+
+        const fillTx = new Transaction().add({
+            ...ix2,
+            programId: new PublicKey(ix2.programId.toBuffer()),
+            keys: ix2.accounts.map((a) => ({
+                ...a,
+                pubkey: new PublicKey(a.pubkey.toBuffer())
+            }))
+        })
+
+        fillTx.recentBlockhash = programTestCtx.lastBlockhash
+        fillTx.sign(resolver)
+
+        // ┌────────────┐       ┌───────────┐
+        // │srcEscrowAta│──SRC─▶│srcTakerAta│
+        // └────────────┘       └───────────┘
+        // ┌───────────┐       ┌───────────┐
+        // │dstMakerAta│◀─DST──│dstTakerAta│
+        // └───────────┘       └───────────┘
+        const [srcEscrowAta, dstCustomReceiverAta, srcTakerAta, dstTakerAta] =
+            await withBalanceChanges(
+                programTestCtx,
+                () => programTestCtx.banksClient.processTransaction(fillTx),
+                [
+                    order.getEscrow(maker.publicKey),
+                    getAta(
+                        customReceiver.publicKey,
+                        order.dstMint,
+                        Address.TOKEN_PROGRAM_ID
+                    ),
+                    getAta(
+                        resolver.publicKey,
+                        order.srcMint,
+                        Address.TOKEN_PROGRAM_ID
+                    ),
+                    getAta(
+                        resolver.publicKey,
+                        order.dstMint,
+                        Address.TOKEN_PROGRAM_ID
+                    )
+                ]
+            )
+
+        expect(srcEscrowAta).toEqual(-srcTakerAta)
+        expect(dstCustomReceiverAta).toEqual(-dstTakerAta)
+        expect(dstCustomReceiverAta).toEqual(order.minDstAmount)
         expect(srcTakerAta).toEqual(order.srcAmount)
         // endregion fill
     })

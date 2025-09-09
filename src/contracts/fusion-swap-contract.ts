@@ -180,7 +180,9 @@ export class FusionSwapContract {
                     // 3. maker_receiver
                     pubkey: order.receiver,
                     isSigner: false,
-                    isWritable: order.dstAssetIsNative
+                    isWritable:
+                        order.dstAssetIsNative ||
+                        !accounts.maker.equal(order.receiver)
                 },
                 {
                     // 4. src_mint
