@@ -71,7 +71,7 @@
     "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "~8.24.1",
     "@typescript-eslint/parser": "~8.24.1",
-    "axios": "1.9.0",
+    "axios": "^1.15.2",
     "camelcase": "8.0.0",
     "eslint": "9.25.1",
     "eslint-config-prettier": "~10.1.2",
@@ -102,7 +102,12 @@
       "bufferutil",
       "esbuild",
       "utf-8-validate"
-    ]
+    ],
+    "overrides": {
+      "flatted@<3.4.2": ">=3.4.2",
+      "minimatch@<10.2.1": ">=10.2.1",
+      "picomatch@<2.3.2": ">=2.3.2"
+    }
   },
   "dependencies": {
     "@1inch/byte-utils": "3.1.0",
