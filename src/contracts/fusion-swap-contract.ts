@@ -273,7 +273,7 @@ export class FusionSwapContract {
                           isSigner: false
                       },
                 // 15. protocol_dst_ata
-                order.dstAssetIsNative || !order.fees?.protocolDstAta
+                !order.fees?.protocolDstAta
                     ? this.OPTIONAL_ACCOUNT_META
                     : {
                           pubkey: order.fees.protocolDstAta,
@@ -281,7 +281,7 @@ export class FusionSwapContract {
                           isSigner: false
                       },
                 // 16. integrator_dst_ata
-                order.dstAssetIsNative || !order.fees?.integratorDstAta
+                !order.fees?.integratorDstAta
                     ? this.OPTIONAL_ACCOUNT_META
                     : {
                           pubkey: order.fees.integratorDstAta,
@@ -485,19 +485,19 @@ export class FusionSwapContract {
                     isSigner: false
                 },
                 // 12. protocol_dst_ata
-                order.dstAssetIsNative || !order.fees?.protocolDstAta
+                !order.fees?.protocolDstAta
                     ? this.OPTIONAL_ACCOUNT_META
                     : {
                           pubkey: order.fees.protocolDstAta,
-                          isWritable: true,
+                          isWritable: false,
                           isSigner: false
                       },
                 // 13. integrator_dst_ata
-                order.dstAssetIsNative || !order.fees?.integratorDstAta
+                !order.fees?.integratorDstAta
                     ? this.OPTIONAL_ACCOUNT_META
                     : {
                           pubkey: order.fees.integratorDstAta,
-                          isWritable: true,
+                          isWritable: false,
                           isSigner: false
                       }
             ],
