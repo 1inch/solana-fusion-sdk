@@ -9,14 +9,23 @@ import {
 } from '@solana/spl-token'
 import {
     airdropAccount,
+    nativeMintAccount,
     sol,
     SYSTEM_PROGRAM_ID,
-    withBalanceChanges
+    withBalanceChanges,
+    withLamportChanges
 } from './utils'
 import {TestConnection} from './test-connection'
 import {IDL as WhitelistIDL} from '../src/idl/whitelist'
 import {getPda} from '../src/utils/addresses/pda'
-import {Address, AuctionDetails, FusionOrder, FusionSwapContract} from '../src'
+import {
+    Address,
+    AuctionDetails,
+    Bps,
+    FeeConfig,
+    FusionOrder,
+    FusionSwapContract
+} from '../src'
 import {id} from '../src/utils/id'
 import {now} from '../src/utils/time/now'
 import {getAta} from '../src/utils/addresses/ata'
@@ -30,6 +39,7 @@ describe('FusionSwap', () => {
     const customReceiver = Keypair.generate()
     const resolver = Keypair.generate()
     const owner = Keypair.generate()
+    const integratorFeeRecipient = Keypair.generate()
     const whitelistProgramId = new PublicKey(
         WhitelistContract.ADDRESS.toBuffer()
     )
@@ -54,7 +64,9 @@ describe('FusionSwap', () => {
             [
                 airdropAccount(maker.publicKey, sol(100)),
                 airdropAccount(resolver.publicKey, sol(100)),
-                airdropAccount(owner.publicKey, sol(100))
+                airdropAccount(owner.publicKey, sol(100)),
+                airdropAccount(integratorFeeRecipient.publicKey, sol(1)),
+                nativeMintAccount()
             ]
         )
 
@@ -488,6 +500,221 @@ describe('FusionSwap', () => {
         )
 
         expect(srcEscrowAta).toEqual(-srcMakerAta)
+        // endregion cancel escrow
+    })
+
+    it('should fill native-dst order with integrator fee', async () => {
+        const order = FusionOrder.new(
+            {
+                srcMint: Address.fromPublicKey(srcToken.publicKey),
+                dstMint: Address.NATIVE,
+                srcAmount: BigInt(sol(0.1)),
+                minDstAmount: BigInt(sol(0.02)),
+                estimatedDstAmount: BigInt(sol(0.02)),
+                id: id(),
+                receiver: Address.fromPublicKey(maker.publicKey)
+            },
+            AuctionDetails.noAuction(now(), 180),
+            {
+                fees: FeeConfig.onlyIntegrator(
+                    Address.fromPublicKey(integratorFeeRecipient.publicKey),
+                    new Bps(500n)
+                )
+            }
+        )
+
+        const contract = FusionSwapContract.default()
+
+        // region create escrow
+        const ix = contract.create(order, {
+            maker: Address.fromPublicKey(maker.publicKey),
+            srcTokenProgram: Address.fromPublicKey(TOKEN_PROGRAM_ID)
+        })
+
+        const initTx = new Transaction().add({
+            ...ix,
+            programId: new PublicKey(ix.programId.toBuffer()),
+            keys: ix.accounts.map((a) => ({
+                ...a,
+                pubkey: new PublicKey(a.pubkey.toBuffer())
+            }))
+        })
+
+        initTx.recentBlockhash = programTestCtx.lastBlockhash
+        initTx.sign(maker)
+
+        const [makerDiff, escrowDiff] = await withBalanceChanges(
+            programTestCtx,
+            () => programTestCtx.banksClient.processTransaction(initTx),
+            [
+                getAta(
+                    maker.publicKey,
+                    srcToken.publicKey,
+                    Address.TOKEN_PROGRAM_ID
+                ),
+                order.getEscrow(maker.publicKey)
+            ]
+        )
+
+        expect(makerDiff).toEqual(-order.srcAmount)
+        expect(escrowDiff).toEqual(order.srcAmount)
+
+        // endregion create escrow
+
+        const escrowAccount = await programTestCtx.banksClient.getAccount(
+            new PublicKey(order.getEscrow(maker.publicKey).toBuffer())
+        )
+        const escrowRent = BigInt(escrowAccount?.lamports ?? 0)
+
+        // region fill
+        const ix2 = contract.fill(order, order.srcAmount, {
+            maker: Address.fromPublicKey(maker.publicKey),
+            taker: Address.fromPublicKey(resolver.publicKey),
+            srcTokenProgram: Address.fromPublicKey(TOKEN_PROGRAM_ID),
+            dstTokenProgram: Address.fromPublicKey(TOKEN_PROGRAM_ID)
+        })
+
+        const fillTx = new Transaction().add({
+            ...ix2,
+            programId: new PublicKey(ix2.programId.toBuffer()),
+            keys: ix2.accounts.map((a) => ({
+                ...a,
+                pubkey: new PublicKey(a.pubkey.toBuffer())
+            }))
+        })
+
+        fillTx.recentBlockhash = programTestCtx.lastBlockhash
+        fillTx.sign(resolver)
+
+        const integratorFeeAmount = (order.minDstAmount * 500n) / 10000n
+        const makerDstAmount = order.minDstAmount - integratorFeeAmount
+
+        // ┌────────────┐       ┌───────────┐
+        // │srcEscrowAta│──SRC─▶│srcTakerAta│
+        // └────────────┘       └───────────┘
+        // ┌───────────┐  SOL  ┌───────────┐   ┌────────────────┐
+        // │   maker   │◀─SOL──│   taker   │──▶│integratorFeeAcc│
+        // └───────────┘       └───────────┘   └────────────────┘
+        let tokenDiffs: bigint[] = []
+        const [makerLamports, integratorLamports] =
+            await withLamportChanges(programTestCtx, async () => {
+                tokenDiffs = await withBalanceChanges(
+                    programTestCtx,
+                    () => programTestCtx.banksClient.processTransaction(fillTx),
+                    [
+                        order.getEscrow(maker.publicKey),
+                        getAta(
+                            resolver.publicKey,
+                            order.srcMint,
+                            Address.TOKEN_PROGRAM_ID
+                        )
+                    ]
+                )
+            }, [maker.publicKey, integratorFeeRecipient.publicKey])
+
+        const [srcEscrowAta, srcTakerAta] = tokenDiffs
+        expect(srcEscrowAta).toEqual(-order.srcAmount)
+        expect(srcTakerAta).toEqual(order.srcAmount)
+        expect(integratorLamports).toEqual(integratorFeeAmount)
+        expect(makerLamports).toEqual(makerDstAmount + escrowRent)
+        // endregion fill
+    })
+
+    it('should cancel expired native-dst order with integrator fee by resolver', async () => {
+        const order = FusionOrder.new(
+            {
+                srcMint: Address.fromPublicKey(srcToken.publicKey),
+                dstMint: Address.NATIVE,
+                srcAmount: BigInt(sol(0.1)),
+                minDstAmount: BigInt(sol(0.02)),
+                estimatedDstAmount: BigInt(sol(0.02)),
+                id: id(),
+                receiver: Address.fromPublicKey(maker.publicKey)
+            },
+            AuctionDetails.noAuction(now(), 1),
+            {
+                fees: FeeConfig.onlyIntegrator(
+                    Address.fromPublicKey(integratorFeeRecipient.publicKey),
+                    new Bps(500n)
+                )
+            }
+        )
+
+        const contract = FusionSwapContract.default()
+
+        // region create escrow
+        const ix = contract.create(order, {
+            maker: Address.fromPublicKey(maker.publicKey),
+            srcTokenProgram: Address.fromPublicKey(TOKEN_PROGRAM_ID)
+        })
+
+        const initTx = new Transaction().add({
+            ...ix,
+            programId: new PublicKey(ix.programId.toBuffer()),
+            keys: ix.accounts.map((a) => ({
+                ...a,
+                pubkey: new PublicKey(a.pubkey.toBuffer())
+            }))
+        })
+
+        initTx.recentBlockhash = programTestCtx.lastBlockhash
+        initTx.sign(maker)
+
+        const [makerDiff, escrowDiff] = await withBalanceChanges(
+            programTestCtx,
+            () => programTestCtx.banksClient.processTransaction(initTx),
+            [
+                getAta(
+                    maker.publicKey,
+                    srcToken.publicKey,
+                    Address.TOKEN_PROGRAM_ID
+                ),
+                order.getEscrow(maker.publicKey)
+            ]
+        )
+
+        expect(makerDiff).toEqual(-order.srcAmount)
+        expect(escrowDiff).toEqual(order.srcAmount)
+
+        // endregion create escrow
+
+        // expire order
+        const clock = await programTestCtx.banksClient.getClock()
+        programTestCtx.setClock(advanceClock(clock, 30n))
+
+        // region cancel escrow
+        const ix2 = contract.cancelOrderByResolver(order, {
+            maker: Address.fromPublicKey(maker.publicKey),
+            srcTokenProgram: Address.fromPublicKey(TOKEN_PROGRAM_ID),
+            resolver: Address.fromPublicKey(resolver.publicKey)
+        })
+
+        const cancelTx = new Transaction().add({
+            ...ix2,
+            programId: new PublicKey(ix2.programId.toBuffer()),
+            keys: ix2.accounts.map((a) => ({
+                ...a,
+                pubkey: new PublicKey(a.pubkey.toBuffer())
+            }))
+        })
+
+        cancelTx.recentBlockhash = programTestCtx.lastBlockhash
+        cancelTx.sign(resolver)
+
+        // ┌────────────┐       ┌───────────┐
+        // │srcEscrowAta│──SRC─▶│srcMakerAta│
+        // └────────────┘       └───────────┘
+        const [srcEscrowAta, srcMakerAta] = await withBalanceChanges(
+            programTestCtx,
+            () => programTestCtx.banksClient.processTransaction(cancelTx),
+            [
+                order.getEscrow(maker.publicKey),
+                getAta(maker.publicKey, order.srcMint, Address.TOKEN_PROGRAM_ID)
+            ]
+        )
+
+        expect(srcEscrowAta).toEqual(-srcMakerAta)
+        expect(srcMakerAta).toEqual(order.srcAmount)
         // endregion cancel escrow
     })
 })
