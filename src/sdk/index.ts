@@ -1,4 +1,5 @@
 export * from './sdk'
 export * from './quote'
+export * from './quote-fee'
 export * from './preset'
 export * from './order-status'

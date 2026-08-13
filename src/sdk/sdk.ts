@@ -35,6 +35,10 @@ export class Sdk {
         return Quote.fromJSON(srcToken, dstToken, signer, quoteRaw)
     }
 
+    /**
+     * Creates an order from a fresh quote, embedding its fees when present.
+     * For fee-bearing SPL flows prefer {@link getQuote} + {@link Quote.toOrder} so {@link Quote.getFeeAtaCreateInstructions} stays available for the create-order transaction
+     */
     public async createOrder(
         srcToken: Address,
         dstToken: Address,
