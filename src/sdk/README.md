@@ -114,7 +114,7 @@ const sdk = new Sdk(new MyProvider(), { baseUrl: 'https://api.1inch.dev/fusion',
 
 
 ### createOrder
-**Description:** create fusion order
+**Description:** create fusion order; throws for a fee-bearing SPL-destination quote — use [getQuote](#getquote) + [Quote.toOrder](./quote.ts) and prepend [Quote.getFeeAtaCreateInstructions](./quote.ts)
 
 **Arguments:**
 - [0] srcToken: [Address](../domains/address.ts) src token mint address

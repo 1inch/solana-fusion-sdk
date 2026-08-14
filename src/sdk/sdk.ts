@@ -1,3 +1,4 @@
+import assert from 'assert'
 import {Quote} from './quote'
 import {OrderStatus} from './order-status'
 import {CancellableOrder} from './cancellable-order'
@@ -37,7 +38,7 @@ export class Sdk {
 
     /**
      * Creates an order from a fresh quote, embedding its fees when present.
-     * For fee-bearing SPL flows prefer {@link getQuote} + {@link Quote.toOrder} so {@link Quote.getFeeAtaCreateInstructions} stays available for the create-order transaction
+     * Throws for a fee-bearing SPL destination — use {@link getQuote} + {@link Quote.toOrder} and prepend {@link Quote.getFeeAtaCreateInstructions} to the create-order transaction
      */
     public async createOrder(
         srcToken: Address,
@@ -52,6 +53,11 @@ export class Sdk {
             amount,
             signer,
             slippage
+        )
+
+        assert(
+            quote.fee === null || quote.dstToken.isNative(),
+            'quote carries partner fees for an SPL destination: use getQuote() + Quote.toOrder() and prepend Quote.getFeeAtaCreateInstructions() to the create-order transaction'
         )
 
         return quote.toOrder()

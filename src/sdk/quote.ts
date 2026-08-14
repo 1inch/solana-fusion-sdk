@@ -102,6 +102,31 @@ export class Quote {
             return []
         }
 
+        return this.feeReceiverWallets(fee).map(
+            (owner) =>
+                new CreateAtaIdempotentInstruction(
+                    payer,
+                    owner,
+                    this.dstToken,
+                    fee.dstTokenProgram
+                )
+        )
+    }
+
+    /**
+     * Fee receiver wallets paid directly for a native-SOL destination.
+     * Verify they exist on-chain before creating the order — lamport transfers to unfunded wallets fail at fill.
+     * An SPL destination and a fee-less quote have none
+     */
+    public getNativeFeeReceiverWallets(): Address[] {
+        if (this.fee === null || !this.dstToken.isNative()) {
+            return []
+        }
+
+        return this.feeReceiverWallets(this.fee)
+    }
+
+    private feeReceiverWallets(fee: QuoteFee): Address[] {
         const owners: Address[] = []
 
         if (fee.receiver !== null) {
@@ -112,15 +137,7 @@ export class Quote {
             owners.push(fee.protocolReceiver)
         }
 
-        return owners.map(
-            (owner) =>
-                new CreateAtaIdempotentInstruction(
-                    payer,
-                    owner,
-                    this.dstToken,
-                    fee.dstTokenProgram
-                )
-        )
+        return owners
     }
 
     private buildFeeConfig(fee: QuoteFee): FeeConfig {

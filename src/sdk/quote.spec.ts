@@ -19,7 +19,7 @@ describe('Quote', () => {
     const receiver = 'hf5iUqe8DAWpHfXhbhJ4rphgETAzjmeH5HGdjM7WSjp'
     const protocolReceiver = 'CckkBNtGaSb61k4y1uzG7WFgerhExf7b82Z8NU4ipFX4'
 
-    const cacheFee: QuoteFeeDTO = {
+    const partnerFee: QuoteFeeDTO = {
         integratorFeeBps: 48,
         protocolFeeBps: 32,
         receiver,
@@ -32,7 +32,7 @@ describe('Quote', () => {
             srcToken,
             dstToken,
             signer,
-            quoteDto({fee: cacheFee})
+            quoteDto({fee: partnerFee})
         )
 
         expect(quote.fee).toBeInstanceOf(QuoteFee)
@@ -56,7 +56,7 @@ describe('Quote', () => {
             dstToken,
             signer,
             quoteDto({
-                fee: {...cacheFee, integratorFeeBps: 0, receiver: null}
+                fee: {...partnerFee, integratorFeeBps: 0, receiver: null}
             })
         )
 
@@ -140,12 +140,12 @@ describe('Quote', () => {
         )
     })
 
-    it('should bake the Cache fee config into an SPL-destination order with the backend wire values', () => {
+    it('should bake the partner fee config into an SPL-destination order with the backend wire values', () => {
         const feeOrder = Quote.fromJSON(
             srcToken,
             dstToken,
             signer,
-            quoteDto({fee: cacheFee})
+            quoteDto({fee: partnerFee})
         ).toOrder()
         const plainOrder = Quote.fromJSON(
             srcToken,
@@ -188,7 +188,7 @@ describe('Quote', () => {
             dstToken,
             Address.NATIVE,
             signer,
-            quoteDto({fee: cacheFee})
+            quoteDto({fee: partnerFee})
         )
 
         const json = quote.toOrder().toJSON()
@@ -204,7 +204,7 @@ describe('Quote', () => {
             srcToken,
             dstToken,
             signer,
-            quoteDto({fee: cacheFee})
+            quoteDto({fee: partnerFee})
         )
 
         const instructions = quote.getFeeAtaCreateInstructions()
@@ -239,7 +239,7 @@ describe('Quote', () => {
             dstToken,
             signer,
             quoteDto({
-                fee: {...cacheFee, integratorFeeBps: 0, receiver: null}
+                fee: {...partnerFee, integratorFeeBps: 0, receiver: null}
             })
         )
 
@@ -249,6 +249,56 @@ describe('Quote', () => {
         expect(instructions[0].owner).toEqual(new Address(protocolReceiver))
     })
 
+    it('should derive a single create instruction when only the integrator fee applies', () => {
+        const quote = Quote.fromJSON(
+            srcToken,
+            dstToken,
+            signer,
+            quoteDto({
+                fee: {...partnerFee, protocolFeeBps: 0}
+            })
+        )
+
+        const json = quote.toOrder().toJSON()
+
+        expect(json.fee.protocolDstAta).toBeNull()
+        expect(json.fee.integratorDstAta).toEqual(
+            getAta(
+                new Address(receiver),
+                dstToken,
+                Address.TOKEN_PROGRAM_ID
+            ).toString()
+        )
+
+        const instructions = quote.getFeeAtaCreateInstructions()
+
+        expect(instructions).toHaveLength(1)
+        expect(instructions[0].owner).toEqual(new Address(receiver))
+    })
+
+    it('should list the fee receiver wallets to fund for a native-SOL destination', () => {
+        const nativeDst = Quote.fromJSON(
+            dstToken,
+            Address.NATIVE,
+            signer,
+            quoteDto({fee: partnerFee})
+        )
+        const splDst = Quote.fromJSON(
+            srcToken,
+            dstToken,
+            signer,
+            quoteDto({fee: partnerFee})
+        )
+        const feeLess = Quote.fromJSON(srcToken, dstToken, signer, quoteDto())
+
+        expect(nativeDst.getNativeFeeReceiverWallets()).toEqual([
+            new Address(receiver),
+            new Address(protocolReceiver)
+        ])
+        expect(splDst.getNativeFeeReceiverWallets()).toEqual([])
+        expect(feeLess.getNativeFeeReceiverWallets()).toEqual([])
+    })
+
     it('should derive fee atas with the token-2022 program when the destination mint uses it', () => {
         const quote = Quote.fromJSON(
             srcToken,
@@ -256,7 +306,7 @@ describe('Quote', () => {
             signer,
             quoteDto({
                 fee: {
-                    ...cacheFee,
+                    ...partnerFee,
                     dstTokenProgram: Address.TOKEN_2022_PROGRAM_ID.toString()
                 }
             })
