@@ -30,6 +30,29 @@ export type PresetDTO = {
 
 export type PresetType = 'fast' | 'medium' | 'slow'
 
+export type QuoteFeeDTO = {
+    /**
+     * Integrator fee in basis points (48 = 0.48%)
+     */
+    integratorFeeBps: number
+    /**
+     * Protocol fee in basis points (32 = 0.32%)
+     */
+    protocolFeeBps: number
+    /**
+     * null when the integrator fee is zero
+     */
+    receiver: string | null
+    /**
+     * Solana address receiving the protocol fee
+     */
+    protocolReceiver: string
+    /**
+     * Token program owning the destination mint; needed to derive the fee token accounts
+     */
+    dstTokenProgram: string
+}
+
 /**
  * @example
  * {
@@ -121,5 +144,9 @@ export type QuoteDTO = {
             dstToken: string
         }
     }
+    /**
+     * null or omitted when no partner fees apply; amounts are already net of these fees
+     */
+    fee?: QuoteFeeDTO | null
     priceImpactPercent: number
 }

@@ -37,14 +37,16 @@ const maker = Keypair.fromSecretKey(secretKey)
 
 const sdk = new Sdk(new AxiosHttpProvider(), { baseUrl: 'https://api.1inch.dev/fusion', authKey, version: 'v1.0' })
 
-// create order
+// quote and create order
 // 1 SOL -> USDC
-const order = await sdk.createOrder(
+// when the quote carries partner fees the order embeds them automatically
+const quote = await sdk.getQuote(
   Address.NATIVE, // SOL
   new Address('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'), // USDC
   1_000_000_000n, // 1 SOL
   Address.fromPublicKey(maker.publicKey)
 )
+const order = quote.toOrder()
 
 const contract = FusionSwapContract.default()
 
@@ -55,14 +57,19 @@ const ix = contract.create(order, {
 })
 
 // generate tx
-const createOrderTx = new Transaction().add({
-  ...ix,
-  programId: new PublicKey(ix.programId.toBuffer()),
-  keys: ix.accounts.map((a) => ({
-    ...a,
-    pubkey: new PublicKey(a.pubkey.toBuffer())
-  }))
-})
+// for an SPL destination prepend the idempotent fee-ata creates — those accounts must exist at fill time
+const createOrderTx = new Transaction()
+
+for (const instruction of [...quote.getFeeAtaCreateInstructions(), ix]) {
+  createOrderTx.add({
+    ...instruction,
+    programId: new PublicKey(instruction.programId.toBuffer()),
+    keys: instruction.accounts.map((a) => ({
+      ...a,
+      pubkey: new PublicKey(a.pubkey.toBuffer())
+    }))
+  })
+}
 
 createOrderTx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash
 createOrderTx.sign(maker)
@@ -85,6 +92,8 @@ export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 ```
+
+When the destination is native SOL, fees are paid to the receiver wallets directly — those wallets must already be funded (rent-exempt), otherwise fills will fail.
 
 #### Cancel order
 
