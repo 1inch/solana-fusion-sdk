@@ -12,17 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v6
         with:
           version: 10
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: pnpm
@@ -31,7 +31,7 @@ jobs:
         run: npm install -g yarn
 
       - name: Cache Solana CLI tools  # cache solana cli-tools
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cache/solana/
@@ -49,7 +49,7 @@ jobs:
           workspaces: "./contracts/fusion-contract"
 
       - name: Cache Rustup
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.rustup
