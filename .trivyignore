@@ -1,0 +1,4 @@
+# Accepted risk (PT9-1364): no patched release exists for bigint-buffer
+# (CVE-2025-3194). Transitive via @solana/spl-token (devDependency) ->
+# @solana/buffer-layout-utils. Not shipped in the published SDK artifact.
+CVE-2025-3194
