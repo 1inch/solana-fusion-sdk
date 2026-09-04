@@ -372,6 +372,22 @@ describe('FusionSwapContract', () => {
             expect(accountKeys).not.toContain(protocolAta.toString())
             expect(accountKeys).not.toContain(integratorAta.toString())
         })
+
+        it('should honor an explicit taker src account and whitelist on fill', () => {
+            const takerSrcAccount = Address.fromBigInt(99n)
+            const whitelist = Address.fromBigInt(88n)
+            const order = newOrder(NON_NATIVE_DST)
+            const ix = FusionSwapContract.default().fill(order, 50n, {
+                maker,
+                taker,
+                srcTokenProgram: Address.TOKEN_PROGRAM_ID,
+                dstTokenProgram: Address.TOKEN_PROGRAM_ID,
+                takerSrcAccount,
+                whitelist
+            })
+
+            expect(ix.accounts[8].pubkey.equal(takerSrcAccount)).toBe(true)
+        })
     })
 })
 
