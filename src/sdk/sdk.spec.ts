@@ -1,6 +1,17 @@
 import {Sdk} from './sdk'
-import {HttpProvider, QuoteDTO, QuoteFeeDTO} from '../api'
-import {Address} from '../domains'
+import {OrderStatus} from './order-status'
+import {ActiveOrder} from './active-order'
+import {CancellableOrder} from './cancellable-order'
+import {Quote} from './quote'
+import {
+    HttpProvider,
+    OrderStatus as OrderStatusEnum,
+    QuoteDTO,
+    QuoteFeeDTO
+} from '../api'
+import {Address, Bps} from '../domains'
+import {AuctionDetails, FusionOrder} from '../fusion-order'
+import {now} from '../utils'
 
 describe('Sdk', () => {
     const srcToken = new Address('So11111111111111111111111111111111111111112')
@@ -52,6 +63,108 @@ describe('Sdk', () => {
         expect(order.toJSON().fee.protocolDstAta).toBeNull()
         expect(order.toJSON().fee.integratorDstAta).toBeNull()
     })
+
+    it('should wrap a quote payload and forward slippage', async () => {
+        const quotePayload = quoteDto()
+        const get = jest.fn(async (_url: string) => quotePayload)
+        const sdk = new Sdk({get, post: jest.fn()} as unknown as HttpProvider, {
+            baseUrl: 'http://localhost',
+            version: 'v1.0'
+        })
+
+        const quote = await sdk.getQuote(
+            srcToken,
+            dstToken,
+            1_000_000_000n,
+            signer,
+            Bps.fromPercent(1)
+        )
+
+        expect(quote).toBeInstanceOf(Quote)
+        expect(quote.quoteId).toBe(quotePayload.quoteId)
+        expect(get.mock.calls[0][0]).toContain('slippage=1')
+        expect(get.mock.calls[0][0]).toContain('enableEstimate=true')
+    })
+
+    it('should wrap order status, active and cancelable listings', async () => {
+        const orderJson = sampleOrder().toJSON()
+        const statusPayload = {
+            maker: signer.toString(),
+            orderHash: 'hash-1',
+            status: OrderStatusEnum.inProgress,
+            order: orderJson,
+            approximateTakingAmount: '1000',
+            expirationTime: 1_700_000_180,
+            fills: [
+                {
+                    txSignature: 'sig-fill',
+                    filledMakerAmount: '10',
+                    filledAuctionTakerAmount: '20'
+                }
+            ],
+            createdAt: 1_700_000_000,
+            srcTokenPriceUsd: 1,
+            dstTokenPriceUsd: 2,
+            cancelable: true
+        }
+        const listing = {
+            meta: {
+                totalItems: 1,
+                itemsPerPage: 100,
+                totalPages: 1,
+                currentPage: 1
+            },
+            items: [
+                {
+                    orderHash: 'hash-1',
+                    txSignature: 'sig-create',
+                    maker: signer.toString(),
+                    order: orderJson,
+                    remainingMakerAmount: '500'
+                }
+            ]
+        }
+        const get = jest.fn(async (url: string) => {
+            if (url.includes('/order/status/')) {
+                return statusPayload
+            }
+
+            return listing
+        })
+        const sdk = new Sdk({get, post: jest.fn()} as unknown as HttpProvider, {
+            baseUrl: 'http://localhost',
+            version: 'v1.0'
+        })
+
+        const status = await sdk.getOrderStatus('hash-1')
+        const active = await sdk.getActiveOrders(1, 50)
+        const cancelable = await sdk.getOrdersCancellableByResolver()
+
+        expect(status).toBeInstanceOf(OrderStatus)
+        expect(status.isActive()).toBe(true)
+        expect(status.orderHash).toBe('hash-1')
+        expect(status.fills[0].filledMakerAmount).toBe(10n)
+        expect(active.items[0]).toBeInstanceOf(ActiveOrder)
+        expect(active.items[0].remainingMakerAmount).toBe(500n)
+        expect(cancelable.items[0]).toBeInstanceOf(CancellableOrder)
+        expect(cancelable.items[0].maker.equal(signer)).toBe(true)
+        expect(get.mock.calls[1][0]).toContain('limit=50')
+    })
+
+    function sampleOrder(): FusionOrder {
+        return FusionOrder.new(
+            {
+                srcMint: srcToken,
+                dstMint: dstToken,
+                srcAmount: 1000n,
+                minDstAmount: 2000n,
+                estimatedDstAmount: 2000n,
+                id: 1,
+                receiver: signer
+            },
+            AuctionDetails.noAuction(now(), 180)
+        )
+    }
 
     function makeSdk(quote: QuoteDTO): Sdk {
         const provider = {

@@ -344,6 +344,32 @@ describe('Quote', () => {
         expect(quote.getFeeAtaCreateInstructions()).toEqual([])
     })
 
+    it('should require a quoteId from an estimated quote', () => {
+        expect(() =>
+            Quote.fromJSON(
+                srcToken,
+                dstToken,
+                signer,
+                quoteDto({quoteId: undefined})
+            )
+        ).toThrow('quoteId is required')
+    })
+
+    it('should build an order for an explicit preset and receiver', () => {
+        const receiverWallet = new Address(
+            'hf5iUqe8DAWpHfXhbhJ4rphgETAzjmeH5HGdjM7WSjp'
+        )
+        const order = Quote.fromJSON(
+            srcToken,
+            dstToken,
+            signer,
+            quoteDto()
+        ).toOrder('medium', receiverWallet)
+
+        expect(order.receiver.equal(receiverWallet)).toBe(true)
+        expect(order.minDstAmount).toBe(146227772n)
+    })
+
     function quoteDto(overrides: Partial<QuoteDTO> = {}): QuoteDTO {
         const preset = {
             startAuctionIn: 180,
