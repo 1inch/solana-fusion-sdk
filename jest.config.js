@@ -3,9 +3,15 @@ module.exports = {
     rootDir: 'src',
     testRegex: '.*\\.(spec|test)\\.ts$',
     transform: {
-        '^.+\\.(t|j)s$': '@swc/jest'
+        '^.+\\.(t|j)s$': ['@swc/jest', {sourceMaps: true}]
     },
-    collectCoverageFrom: ['**/*.(t|j)s'],
+    collectCoverageFrom: [
+        '**/*.(t|j)s',
+        '!**/*.spec.ts',
+        '!**/*.test.ts',
+        '!**/idl/**'
+    ],
     coverageDirectory: '../coverage',
+    coverageProvider: 'v8',
     testEnvironment: 'node'
 }

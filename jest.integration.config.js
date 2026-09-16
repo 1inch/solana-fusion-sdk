@@ -6,10 +6,16 @@ module.exports = {
     globalSetup: '<rootDir>/global-setup.ts',
     globalTeardown: '<rootDir>/global-tear-down.ts',
     transform: {
-        '^.+\\.(t|j)s$': '@swc/jest'
+        '^.+\\.(t|j)s$': ['@swc/jest', {sourceMaps: true}]
     },
-    collectCoverageFrom: ['**/*.(t|j)s'],
+    collectCoverageFrom: [
+        '../src/**/*.(t|j)s',
+        '!../src/**/*.spec.ts',
+        '!../src/**/*.test.ts',
+        '!../src/**/idl/**'
+    ],
     testTimeout: 20_000,
     coverageDirectory: '../coverage',
+    coverageProvider: 'v8',
     testEnvironment: 'node'
 }
