@@ -39,4 +39,18 @@ describe('AxiosHttpProvider', () => {
             {headers: {}}
         )
     })
+
+    it('should reject with the axios error when GET or POST fails', async () => {
+        const error = new Error('Request failed with status code 500')
+        axiosMock.get.mockRejectedValue(error)
+        axiosMock.post.mockRejectedValue(error)
+        const provider = new AxiosHttpProvider()
+
+        await expect(
+            provider.get('https://example.test/quote', {})
+        ).rejects.toBe(error)
+        await expect(
+            provider.post('https://example.test/orders', {}, {})
+        ).rejects.toBe(error)
+    })
 })
