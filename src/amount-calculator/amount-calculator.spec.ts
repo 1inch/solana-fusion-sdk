@@ -69,4 +69,42 @@ describe('AmountCalculator', () => {
 
         expect(totalFee).toEqual(245n) // ((1000 - 10 - 20) - 500)*.5 + 10
     })
+
+    it('should ceil the proportional taking amount', () => {
+        expect(AmountCalculator.calcTakingAmount(50n, 100n, 200n)).toEqual(100n)
+        expect(AmountCalculator.calcTakingAmount(1n, 3n, 10n)).toEqual(4n)
+    })
+
+    it('should treat a missing fee calculator as zero fees', () => {
+        const calculator = new AmountCalculator(
+            AuctionCalculator.fromAuctionData(
+                AuctionDetails.noAuction(now(), 120)
+            )
+        )
+
+        expect(calculator.getTotalFee(1000n, 500n, now())).toEqual(0n)
+        expect(calculator.getUserReceiveAmount(1000n, 500n, now())).toEqual(
+            1000n
+        )
+        expect(calculator.getIntegratorFee(1000n, now())).toEqual(0n)
+        expect(calculator.getProtocolFee(1000n, 500n, now())).toEqual(0n)
+        expect(calculator.getRequiredTakingAmount(1000n, now())).toEqual(1000n)
+    })
+
+    it('should return the user receive amount after auction and fees', () => {
+        const calculator = new AmountCalculator(
+            AuctionCalculator.fromAuctionData(
+                AuctionDetails.noAuction(now(), 120)
+            ),
+            new FeeCalculator(
+                Bps.fromPercent(1),
+                Bps.fromPercent(2),
+                Bps.fromPercent(50)
+            )
+        )
+
+        expect(calculator.getUserReceiveAmount(1000n, 1000n, now())).toEqual(
+            970n
+        )
+    })
 })

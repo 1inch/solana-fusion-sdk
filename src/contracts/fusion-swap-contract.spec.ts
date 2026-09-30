@@ -1,10 +1,12 @@
 import {FusionSwapContract} from './fusion-swap-contract'
 import {TransactionInstruction} from './transaction-instruction'
+import {WhitelistContract} from './whitelist-contract'
 import {FusionOrder} from '../fusion-order/fusion-order'
 import {AuctionDetails} from '../fusion-order/auction-details'
 import {FeeConfig} from '../fusion-order/fee-config'
 import {Address, Bps} from '../domains'
 import {now} from '../utils'
+import {getPda} from '../utils/addresses/pda'
 
 const NONE_PLACEHOLDER = FusionSwapContract.ADDRESS
 const USDC = new Address('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
@@ -39,11 +41,14 @@ const surplusOnlyFee = new FeeConfig(
 
 const CREATE_ACCOUNTS = {PROTOCOL_DST_ATA: 10, INTEGRATOR_DST_ATA: 11}
 const FILL_ACCOUNTS = {
+    RESOLVER_ACCESS: 1,
     ESCROW_SRC_ATA: 7,
+    TAKER_SRC_ATA: 8,
     PROTOCOL_DST_ATA: 15,
     INTEGRATOR_DST_ATA: 16
 }
 const CANCEL_BY_RESOLVER_ACCOUNTS = {
+    RESOLVER_ACCESS: 1,
     ESCROW_SRC_ATA: 7,
     PROTOCOL_DST_ATA: 11,
     INTEGRATOR_DST_ATA: 12
@@ -372,8 +377,77 @@ describe('FusionSwapContract', () => {
             expect(accountKeys).not.toContain(protocolAta.toString())
             expect(accountKeys).not.toContain(integratorAta.toString())
         })
+
+        it('should honor an explicit taker src account and whitelist on fill', () => {
+            const takerSrcAccount = Address.fromBigInt(99n)
+            const whitelist = Address.fromBigInt(88n)
+            const order = newOrder(NON_NATIVE_DST)
+            const ix = FusionSwapContract.default().fill(order, 50n, {
+                maker,
+                taker,
+                srcTokenProgram: Address.TOKEN_PROGRAM_ID,
+                dstTokenProgram: Address.TOKEN_PROGRAM_ID,
+                takerSrcAccount,
+                whitelist
+            })
+
+            expectAccount(ix, FILL_ACCOUNTS.TAKER_SRC_ATA, takerSrcAccount, {
+                isWritable: true
+            })
+            expectAccount(
+                ix,
+                FILL_ACCOUNTS.RESOLVER_ACCESS,
+                resolverAccess(whitelist, taker),
+                {isWritable: false}
+            )
+            expect(accountAt(ix, FILL_ACCOUNTS.RESOLVER_ACCESS)).not.toBe(
+                resolverAccess(WhitelistContract.ADDRESS, taker).toString()
+            )
+        })
+
+        it('should derive resolver access from the default whitelist on fill', () => {
+            expectAccount(
+                buildFill(newOrder(NON_NATIVE_DST)),
+                FILL_ACCOUNTS.RESOLVER_ACCESS,
+                resolverAccess(WhitelistContract.ADDRESS, taker),
+                {isWritable: false}
+            )
+        })
+
+        it('should derive resolver access from an explicit whitelist on cancelOrderByResolver', () => {
+            const whitelist = Address.fromBigInt(88n)
+            const ix = FusionSwapContract.default().cancelOrderByResolver(
+                newOrder(NON_NATIVE_DST),
+                {
+                    maker,
+                    resolver,
+                    srcTokenProgram: Address.TOKEN_PROGRAM_ID,
+                    whitelist
+                }
+            )
+
+            expectAccount(
+                ix,
+                CANCEL_BY_RESOLVER_ACCOUNTS.RESOLVER_ACCESS,
+                resolverAccess(whitelist, resolver),
+                {isWritable: false}
+            )
+            expectAccount(
+                buildCancelByResolver(newOrder(NON_NATIVE_DST)),
+                CANCEL_BY_RESOLVER_ACCOUNTS.RESOLVER_ACCESS,
+                resolverAccess(WhitelistContract.ADDRESS, resolver),
+                {isWritable: false}
+            )
+        })
     })
 })
+
+function resolverAccess(whitelist: Address, resolverAddress: Address): Address {
+    return getPda(whitelist, [
+        new TextEncoder().encode('resolver_access'),
+        resolverAddress.toBuffer()
+    ])
+}
 
 function newOrder(dstMint: Address, fees?: FeeConfig): FusionOrder {
     return FusionOrder.new(
